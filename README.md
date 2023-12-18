@@ -30,6 +30,6 @@ Bergabung dengan Diskusi:
 Ikuti forum dan diskusi, berikan wawasan, dan terhubung dengan orang-orang yang memiliki minat serupa.
 
 Hubungi Kami
-Jika Anda memiliki pertanyaan, saran, atau masukan, jangan ragu untuk menghubungi tim In Money melalui email support@inmoney.com atau melalui formulir kontak di situs web kami.
+Jika Anda memiliki pertanyaan, saran, atau masukan, jangan ragu untuk menghubungi tim In Money melalui instagram @patriott_07 atau melalui formulir kontak di situs web kami.
 
 Salam bijak dan selamat mencatat keuangan di In Money! 🚀✨
