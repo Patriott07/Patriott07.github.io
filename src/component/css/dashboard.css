@@ -1,0 +1,40 @@
+.app {}
+
+.left-bar {
+    background: #FFF;
+}
+
+.right-bar {
+    background: #FFF;
+}
+
+.main-content {
+    background: #F6F6F6;
+}
+
+span.chip {
+    border-radius: 10px;
+    background: rgba(59, 74, 91, 0.90);
+    padding: 4px 8px;
+    color: #F6F6F6;
+
+}
+
+.nav-tab-active{
+    background: rgba(59, 74, 91, 0.90)!important;
+    color: #F6F6F6!important;
+}
+
+.nav-tab{
+    border-radius: 10px;
+    width: 250px;
+    padding: 12px 15px;
+    background: #D9D9D9;
+    color: black;
+}
+.nav-tab svg path{
+    fill: black;
+}
+.nav-tab-active svg path{
+    fill: white;
+}

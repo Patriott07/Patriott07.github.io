@@ -31,7 +31,7 @@ function Home() {
         // Panggil getDataFeedback saat komponen di-mount
         getDataFeedback();
         getUserInfo();
-        redirectLogin(token, false);
+        // redirectLogin(token, false);
     }, []); // Gunakan array kosong agar useEffect hanya dijalankan sekali setelah mounting
 
     function getUserInfo() {
@@ -64,7 +64,7 @@ function Home() {
         if (!token) {
             navigate(path); //dia akan pindah
         }
-        if (showAlert) {
+        if(showAlert && token) {
             Swal.fire({
                 title: "Malfunction",
                 text: 'Kamu udah login. permintaan dibatalkan.',
@@ -96,11 +96,11 @@ function Home() {
                 setRating('');
 
             }).catch(error => {
-                Swal.fire({
-                    title: "Malfunction",
-                    text: error.response.data.message,
-                    icon: "error"
-                });
+                // Swal.fire({
+                //     title: "Malfunction",
+                //     text: error.response.data.message,
+                //     icon: "error"
+                // });
             })
     }
 
@@ -133,7 +133,7 @@ function Home() {
                             <div className="mb-3">
                                 <div className="d-lg-flex d-md-flex align-items-center gap-2 justify-content-start">
                                     <div>
-                                        <Mybutton type='button' value='Ayo, mulai sekarang! ' fixClass='Mybutton2' clas='px-3 py-2 position-relative mb-3' />
+                                        <Mybutton type='button' value='Ayo, mulai sekarang!' event={() => { navigate('/dashboard')}} fixClass='Mybutton2' clas='px-3 py-2 position-relative mb-3' />
                                     </div>
                                     <div className="fs16">
                                         Tidak punya Account ? <A value="Daftar disini" event={() => { keepHere(token, '/signup') }} clas='a' />
@@ -270,6 +270,7 @@ function Home() {
                                     placeholder="Leave a comment here"
                                     style={{ height: '120px' }}
                                     onChange={(e) => setText(e.target.value)}
+                                    value={text}
                                     required
                                 />
                                 <div className="form-text">
@@ -279,7 +280,7 @@ function Home() {
                             <div className="row mt-3">
                                 <div className="col-6">
                                     <FloatingLabel controlId="rating" label="give me some rating..">
-                                        <Form.Select aria-label="Floating label select example" onChange={(e) => setRating(e.target.value)} required>
+                                        <Form.Select aria-label="Floating label select example" value={rating} onChange={(e) => setRating(e.target.value)} required>
                                             <option>Open this select menu</option>
                                             <option value="1">One</option>
                                             <option value="2">Two</option>
