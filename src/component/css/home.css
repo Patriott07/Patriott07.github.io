@@ -1,35 +1,178 @@
-.nav{
+/* config basic */
+
+* {}
+
+/* navbar and header */
+.nav {
     border-bottom: 2px solid rgba(128, 128, 128, 0.407);
-    background: #FFF!important;
+    background: #FFF !important;
 }
 
-.mark-logo{
-    color: #586E88!important;
+.mark-logo {
+    color: #3B4A5B !important;
 }
 
-.Mybutton{
+img{
+    border: 2px solid transparent;
+    /* transition: all 0.2s; */
+    padding: 6px;
+}
+img:hover{
+    border: 2px dashed #1D252D;
+
+}
+
+.Mybutton {
     border-radius: 12px;
-    color: white;
+    color: white !important;
     background: #3B4A5B;
     border: none;
     transition: all 0.3s;
 }
-.Mybutton:hover{
+
+.Mybutton:hover {
     background: #3b4a5bdf;
 }
 
-
-
-.link-nav::after{
-    position: absolute;
-    bottom: -10px;
-    left: 0;
-    height: 3px;
-    width: 60%;
-    background-color: #3B4A5B;
-    transition: all 0.6s;
-
+.Mybutton2 {
+    border-radius: 12px;
+    color: white !important;
+    background: #1D252D;
+    border: none;
+    transition: all 0.3s;
 }
-.link-nav:hover::after{
+
+.Mybutton2:hover {
+    background: #1d252dde;
+}
+
+a, .a, .a2 {
+    text-decoration: none;
+    position: relative;
+    color: #3B4A5B;
+}
+
+.a::after, .a2::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 30%;
+    height: 2px;
+    background-color: #3B4A5B;
+    transition: all 0.4s;
+}
+
+.a2::after {
+    bottom: 5px !important;
+    left: 0.2vw !important;
+}
+
+.a:hover::after, .a2:hover::after {
+    width: 0%;
+}
+
+
+/* section 2 */
+
+#section-2 {
+    margin-top: 200px;
+}
+
+#section-2 .fs40 {
+    color: black;
+}
+
+.My-card {
+    width: 225px;
+    height: 310px;
+    padding-top: 10%;
+    padding-left: 15px;
+    padding-right: 40px;
+    border-radius: 4px;
+    border: 3px solid #586E88;
+    position: relative;
+}
+
+.My-card::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0;
     width: 20%;
+    height: 100%;
+    background: #586E88;
+    z-index: 2;
+    transition: all 0.4s;
+}
+
+.My-card:hover::after {
+    width: 85%;
+    color: #FFF;
+    padding: 10% 30px 10% 20px;
+    font-size: 18px;
+}
+
+.My-card#cardOne:hover::after {
+    content: "Desain yang friendly membantu pengguna menemukan informasi dengan cepat tanpa kehilangan arah.";
+}
+
+.My-card#cardTwo:hover::after {
+    content: "Ceritakan pengelaman menarik anda seputar management uang. dan temukan tips-tips menarik lainnya.";
+}
+
+.My-card#cardThree:hover::after {
+    content: "Kami selalu mengutamakan keamanan dan privasi pelanggan kami. No malware No virus";
+}
+
+.fs27.text-card::after {
+    content: "";
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 30%;
+    height: 2px;
+    background: #A9C6E9;
+}
+
+/* section 3 */
+
+#section-3 {
+    margin-top: 200px;
+}
+
+.container-feedback {
+    background: #BED4EE;
+}
+
+.card-feedback {
+    max-width: 520px;
+    height: 310px;
+    background: white;
+    padding: 40px 50px 40px 30px;
+}
+
+.carosel{
+    width: 80vw;
+}
+
+/* section 4 */
+
+#section-4{
+    margin-top: 200px;
+}
+
+/* footer */
+#footer{
+    margin-top: 200px;
+    border-top: 2px solid #e9e9e9;
+}
+
+@media screen and (max-width: 540px) {
+    .carosel{
+        width: 100vw;
+    }
+    .container-feedback {
+        padding: 0!important;
+    }
 }

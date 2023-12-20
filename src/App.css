@@ -2,6 +2,12 @@
   font-family: Poppins!important;
 }
 
+.fs14{
+  font-size: 14px!important;
+}
+.fs16{
+  font-size: 16px!important;
+}
 .fs18{
   font-size: 18px!important;
 }
@@ -16,3 +22,19 @@
   font-weight: 700;
 }
 
+a:hover,.a:hover{
+  cursor: pointer;
+}
+
+.b{
+  font-weight: 700;
+}
+
+.tGray{
+  color: #919191;
+}
+
+.swiper {
+  width: 600px;
+  height: 300px;
+}
