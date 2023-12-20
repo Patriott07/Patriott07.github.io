@@ -8,6 +8,7 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import { Navigate , useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import Swal from 'sweetalert2';
 
 
 const url = "http://127.0.0.1/API_laravel/public/api";
@@ -19,20 +20,30 @@ function NavbarCom(props) {
         navigate('/signup');
     }
     function handleLogout(){
-        axios.post(`${url}/users/logOut`,{
-                // Authorization : isLogin
-            },
-            {
-                headers : {
-                    Authorization : isLogin
-                }
-            }
-        ).then((response) => {
-            // console.log(response);
-            Cookies.remove('token');
-            Cookies.remove('detailUser');
-            navigate('/login');
-        })
+        Swal.fire({
+            title: "Beneran ?",
+            text: "yakin mau logout? gamau scrool santay-santay dlu? hhe",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, gue bete."
+          }).then((result) => {     
+              axios.post(`${url}/users/logOut`,{
+                      // Authorization : isLogin
+                  },
+                  {
+                      headers : {
+                          Authorization : isLogin
+                      }
+                  }
+              ).then((response) => {
+                  Cookies.remove('token');
+                  Cookies.remove('detailUser');
+                  navigate('/login');
+              })
+          });
+          
     }
     
     return (

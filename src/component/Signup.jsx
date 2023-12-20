@@ -21,29 +21,46 @@ function Signup() {
 
     useEffect(() => {
         // Panggil getDataFeedback saat komponen di-mount
-        // trySignup();
-        Cookies.set('isSecure', "rahasia" , {secure:true} );
-        console.log(Cookies.get());
+        
     }, []);
 
-    function trySignup() {
-        // if(del){
-        //     Cookies.remove(del);
-        //     console.log(Cookies.get(), 'is deleted?');
-        // }else{
-        //     // console.log(Cookies.get('name'));
-        //     Cookies.set('myGf','Febii', { expires: 7, secure : true });
-        //     console.log(Cookies.get());
-        // }
+    function trySignup() { 
+        axios.post(`${url}/users/signUp`,{
+            email : email,
+            password : password,
+            name : username
+        }).then((response) => {
+            console.log(response);
+            Swal.fire({
+                title: "Congrats",
+                text: response.data.data.message + '. <br> Btw you wanna save the email? for another from.',
+                icon: "success",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, Make it!"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    Cookies.set('email', email , {expires : 7})
+                    Cookies.set('pass', password , {expires : 7})
+                  Swal.fire({
+                    title: "Clear",
+                    text: "Now everything is gonna be easy.",
+                    icon: "success"
+                  });
+                }
 
-        
-        // axios.post(`${url}/users/signUp`,{
-        //     email : email,
-        //     password : password
-        // }).then((response) => {
-        //     console.log(response);
-        // });
-        
+                navigate('/login');
+
+              });
+        }).catch(error => {
+            console.log(error);
+            Swal.fire({
+                title: "Malfunction",
+                text: error.response.data.message,
+                icon: "error"
+            });
+        });
     }
     return (
         <div id='login'>
@@ -87,7 +104,7 @@ function Signup() {
                             <Form.Control type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
                         </FloatingLabel>
 
-                        <Mybutton type='button' event={() => trySignup()} value='Login' fixClass='Mybutton2' clas='mt-3 px-3 py-2 text-start' />
+                        <Mybutton type='button' event={() => trySignup()} value='Create account' fixClass='Mybutton2' clas='mt-3 px-3 py-2 text-start' />
                     </div>
                 </div>
             </div>
