@@ -9,10 +9,11 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useEffect } from 'react';
 import Swal from 'sweetalert2';
+import Cookies from 'js-cookie';
 
 
 const url = "http://127.0.0.1/API_laravel/public/api";
-function Signup(){
+function Signup() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
@@ -20,23 +21,34 @@ function Signup(){
 
     useEffect(() => {
         // Panggil getDataFeedback saat komponen di-mount
-       
+        // trySignup();
+        Cookies.set('isSecure', "rahasia" , {secure:true} );
+        console.log(Cookies.get());
     }, []);
 
-    function trySignup(){
-        /*
-        // axios.post(`${url}/users/login`,{
+    function trySignup() {
+        // if(del){
+        //     Cookies.remove(del);
+        //     console.log(Cookies.get(), 'is deleted?');
+        // }else{
+        //     // console.log(Cookies.get('name'));
+        //     Cookies.set('myGf','Febii', { expires: 7, secure : true });
+        //     console.log(Cookies.get());
+        // }
+
+        
+        // axios.post(`${url}/users/signUp`,{
         //     email : email,
         //     password : password
         // }).then((response) => {
         //     console.log(response);
-        // })
-        */
+        // });
+        
     }
     return (
         <div id='login'>
             <div className="app-signup container vh-100 text-center">
-                <div className="fs40 mark-logo">
+                <div className="fs40 mark-logo" onClick={()=> navigate('/')}>
                     inMoney.
                 </div>
                 <div className="mt-3">
@@ -75,7 +87,7 @@ function Signup(){
                             <Form.Control type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
                         </FloatingLabel>
 
-                        <Mybutton type='button' event={trySignup} value='Login' fixClass='Mybutton2' clas='mt-3 px-3 py-2 text-start' />
+                        <Mybutton type='button' event={() => trySignup()} value='Login' fixClass='Mybutton2' clas='mt-3 px-3 py-2 text-start' />
                     </div>
                 </div>
             </div>

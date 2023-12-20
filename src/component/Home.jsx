@@ -14,6 +14,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useEffect } from 'react';
 import Swal from 'sweetalert2';
+import Cookies from 'js-cookie';
 
 // const axios = require('axios');
 const url = "http://127.0.0.1/API_laravel/public/api";
@@ -21,44 +22,85 @@ const url = "http://127.0.0.1/API_laravel/public/api";
 function Home() {
     const navigate = useNavigate();
     const [dataFeedback, setDataFeedback] = useState([]);
-    const [text , setText] = useState('');
+    const [text, setText] = useState('');
     const [rating, setRating] = useState('');
-    const [token, setToken] = useState('Bearer 15|gJsN1oOxrrzWKmMxXV6FaZIPxppAXyT0kGcFh5Zie568ebb6')
+    const [token, setToken] = useState(Cookies.get('token'));
+    const [user, setUser] = useState('');
 
     useEffect(() => {
         // Panggil getDataFeedback saat komponen di-mount
         getDataFeedback();
+        getUserInfo();
+        redirectLogin(token, false);
     }, []); // Gunakan array kosong agar useEffect hanya dijalankan sekali setelah mounting
 
+    function getUserInfo() {
+        if (Cookies.get('detailUser')) {
+            setUser(JSON.parse(Cookies.get('detailUser')));
+        }
+        console.log(Cookies.get('detailUser'), user, token);
+    }
     async function getDataFeedback() {
         const response = await axios.get(`${url}/feedback`);
         setDataFeedback(response.data.data);
         console.log(dataFeedback);
     }
 
+    function redirectLogin(data, showAlert = true) {
+        if (!data && showAlert === true) {
+            Swal.fire({
+                title: "Malfunction",
+                text: 'Kamu belum login. permintaan dibatalkan.',
+                icon: "error"
+            }).then(() => {
+                navigate('/login');
+            })
+        } else if (!data && showAlert === false) {
+            navigate('/login');
+        }
+    }
+
+    function keepHere(token, path, showAlert = true) {
+        if (!token) {
+            navigate(path); //dia akan pindah
+        }
+        if (showAlert) {
+            Swal.fire({
+                title: "Malfunction",
+                text: 'Kamu udah login. permintaan dibatalkan.',
+                icon: "error"
+            });
+        }
+        // jika disini ia akan stay
+    }
+
     function postFeedback() {
-        console.log('Sending ..');
+        // console.log('Sending ..');
+        redirectLogin(token); //check is login or not
         axios.post(`${url}/feedback/post`, {
-            content : text,
-            rate : rating
+            content: text,
+            rate: rating
         },
             {
                 headers: {
                     Authorization: token
                 }
             }).then((response) => {
-                console.log(response);
                 Swal.fire({
                     title: "Congrats",
                     text: response.data.message,
                     icon: "success"
-                  });
+                });
 
                 setText('');
                 setRating('');
 
             }).catch(error => {
-                console.log(error);
+                Swal.fire({
+                    title: "Malfunction",
+                    text: error.response.data.message,
+                    icon: "error"
+                });
             })
     }
 
@@ -78,7 +120,7 @@ function Home() {
     // { getDataFeedback() }
     return (
         <div id='home'>
-            <NavbarCom />
+            <NavbarCom isLogin={token} />
             {/* header */}
             <div id="section-1" className='mt-5'>
                 <div className="container">
@@ -94,7 +136,7 @@ function Home() {
                                         <Mybutton type='button' value='Ayo, mulai sekarang! ' fixClass='Mybutton2' clas='px-3 py-2 position-relative mb-3' />
                                     </div>
                                     <div className="fs16">
-                                        Tidak punya Account ? <A value="Daftar disini" href='/signIn' clas='a' />
+                                        Tidak punya Account ? <A value="Daftar disini" event={() => { keepHere(token, '/signup') }} clas='a' />
                                     </div>
                                 </div>
                             </div>
@@ -215,7 +257,7 @@ function Home() {
                                 label="Name"
                                 className="mb-3"
                             >
-                                <Form.Control type="text" readOnly value={`Myname`} placeholder="name@example.com" />
+                                <Form.Control type="text" readOnly value={`${user.name}`} placeholder="name@example.com" />
                                 <div className="form-text">
                                     Write down your name here..
                                 </div>
@@ -245,7 +287,7 @@ function Home() {
                                             <option value="4">Four</option>
                                             <option value="5">Five</option>
                                         </Form.Select>
-                                       
+
                                     </FloatingLabel>
                                 </div>
                                 <div className="col-6">
@@ -310,7 +352,7 @@ function Home() {
 }
 
 function Mybutton(props) {
-    const { value, type, clas, fixClass , event = null} = props;
+    const { value, type, clas, fixClass, event = null } = props;
     return (
         <button className={`${clas} ${fixClass}`} onClick={event} type={type} >
             <span>{value}</span>
@@ -319,9 +361,9 @@ function Mybutton(props) {
 }
 function A(props) {
     const navigate = useNavigate();
-    const { href, value, clas } = props;
+    const { event, value, clas } = props;
     return (
-        <span onClick={() => navigate(href)} className={clas}>{value}</span>
+        <span onClick={event} className={clas}>{value}</span>
     )
 }
 

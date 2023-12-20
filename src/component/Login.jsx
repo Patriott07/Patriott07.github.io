@@ -13,6 +13,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useEffect } from 'react';
 import Swal from 'sweetalert2';
+import Cookies from 'js-cookie';
 
 
 const url = "http://127.0.0.1/API_laravel/public/api";
@@ -32,14 +33,13 @@ function Login() {
     }, []);
 
     function checkedMe(key, type) {
-        const isCheck = localStorage.getItem(key);
+        // const isCheck = localStorage.getItem(key);
+        const isCheck = Cookies.get(key);
         // console.log(isCheck);
         if (isCheck != null) {
             if (type === 'email') {
-
                 setEmail(isCheck);
             } else {
-
                 setPassword(isCheck);
             }   
         }
@@ -47,35 +47,38 @@ function Login() {
     }
 
     function remember(keyEmail, emailVal, keyPass, passVal) {
-        localStorage.setItem(keyEmail, emailVal);
-        localStorage.setItem(keyPass, passVal);
-        console.log('berhasil rember')
+        // localStorage.setItem(keyEmail, emailVal);
+        // localStorage.setItem(keyPass, passVal);
+        Cookies.set(keyEmail, emailVal , {expires : 7})
+        Cookies.set(keyPass, passVal , {expires : 7})
     }
 
     function tryLogin() {
         if (save === true) {
             remember('email', email, 'pass', password);
         }
-        
         axios.post(`${url}/users/login`,{
             email : email,
             password : password
-        }).then((response) => {
-            console.log(response, "succes");
+        }).then((response) =>{
+            if(response.status === 200){
+                Cookies.set('token', `Bearer ${response.data.data.token}` , {expires:7});
+                Cookies.set('detailUser', JSON.stringify(response.data.data.detailUser), {expires:7});
+                // console.log(JSON.parse(Cookies.get('detailUser')), typeof response.data.data.detailUser);
+                navigate('/');
+            }
         }).catch(error => {
-            console.log(error);
             Swal.fire({
                 title: "Malfunction",
                 text: error.response.data.message,
                 icon: "error"
               });
         })
-        
     }
     return (
         <div id='login'>
             <div className="app container vh-100 text-center">
-                <div className="fs40 mark-logo">
+                <div className="fs40 mark-logo" onClick={()=> navigate('/')}>
                     inMoney.
                 </div>
                 <div className="mt-3">

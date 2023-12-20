@@ -5,8 +5,36 @@ import Form from 'react-bootstrap/Form';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
+import { Navigate , useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
-function NavbarCom() {
+
+const url = "http://127.0.0.1/API_laravel/public/api";
+
+function NavbarCom(props) {
+    const navigate = useNavigate();
+    const { isLogin } = props;
+    function handleRedToSign(){
+        navigate('/signup');
+    }
+    function handleLogout(){
+        axios.post(`${url}/users/logOut`,{
+                // Authorization : isLogin
+            },
+            {
+                headers : {
+                    Authorization : isLogin
+                }
+            }
+        ).then((response) => {
+            // console.log(response);
+            Cookies.remove('token');
+            Cookies.remove('detailUser');
+            navigate('/login');
+        })
+    }
+    
     return (
         <Navbar expand="lg" className="bg-body-tertiary nav">
             <Container>
@@ -22,19 +50,28 @@ function NavbarCom() {
                         <Nav.Link href="#" className="link-nav a2 position-relative">Keuntungan</Nav.Link>
                         <Nav.Link href="#action2" className="link-nav a2 position-relative">Testimony</Nav.Link>
                         <Nav.Link href="#action2" className="link-nav a2 position-relative">Contact</Nav.Link>
+                        {/* <Nav.Link href="#action2" className="link-nav a2 position-relative">{//isLogin}</Nav.Link> */}
 
                     </Nav>
-                    <Mybutton type='button' value='Buat Akun' fixClass='Mybutton' clas='px-3 py-2 position-relative'/>
+                    {
+                        isLogin == null 
+                            ?(
+                                <Mybutton type='button' event={handleRedToSign} value='Buat Akun' fixClass='Mybutton' clas='px-3 py-2 position-relative' />
+                            )
+                            :(
+                                <Mybutton type='button' event={handleLogout} value='Logout' fixClass='Mybutton' clas='px-3 py-2 position-relative' />
+                            )
+                    }
                 </Navbar.Collapse>
             </Container>
         </Navbar>
     );
 }
 
-function Mybutton(props){
-    const {value, type, clas, fixClass } = props;
+function Mybutton(props) {
+    const { value, type, clas, fixClass, event } = props;
     return (
-        <button className={`${clas} ${fixClass}`} type={type} >
+        <button className={`${clas} ${fixClass}`} type={type} onClick={event} >
             <span>{value}</span>
         </button>
     );
