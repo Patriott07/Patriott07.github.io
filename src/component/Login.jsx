@@ -22,12 +22,14 @@ function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [save, setSave] = useState('');
-    const [token, setToken] = useState('')
+    const [token, setToken] = useState(Cookies.get('token'))
     // const [remember, setRemember] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
         // Panggil getDataFeedback saat komponen di-mount
+        redirectToHome(token);
+        new Promise((promise)=>{setTimeout(promise)},2000);
         checkedMe('email', 'email');
         checkedMe('pass', 'password');
     }, []);
@@ -43,7 +45,14 @@ function Login() {
                 setPassword(isCheck);
             }   
         }
-        
+    }
+
+    function redirectToHome(token){
+        if(token == null){
+            
+        }else if(token !== null || token !== undefined ){
+            navigate('/');
+        }
     }
 
     function remember(keyEmail, emailVal, keyPass, passVal) {
