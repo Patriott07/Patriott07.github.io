@@ -2,13 +2,7 @@ import '../component/css/dashboard.css';
 import 'https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js';
 import 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import headerFoto from '../image/header.png';
-import NavbarCom from './child/navbar';
 import { Navigate, useNavigate } from 'react-router-dom';
-import Carousel from 'react-bootstrap/Carousel';
-import imageFeedback from '../image/feedback-image.png';
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
-import Form from 'react-bootstrap/Form';
 import { useState } from 'react';
 import axios from 'axios';
 import { useEffect } from 'react';
@@ -21,16 +15,41 @@ import myLoad from '../asset/Load.json'
 
 function Dashboard() {
     const [token, setToken] = useState(Cookies.get('token'));
-    const [user, setUser] = useState(JSON.parse(Cookies.get('detailUser')));
+    const [user, setUser] = useState(null);
     const [pageSlice, setPageSlice] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [file, setFile] = useState(null);
     const navigate = useNavigate();
-    useEffect(() => {
+    useEffect(function () {
         // Panggil getDataFeedback saat komponen di-mount
         redirectLogin(token, false);
-        console.log(user);
+        load(2).then(() => {
+            setUser(JSON.parse(Cookies.get('detailUser')));
+            setLoading(false);
+            console.log(user);
+        })
     }, []);
 
+    //distract
+    function clickAvatar(){
+        const icon = document.getElementById('avatar');
+        icon.click(); // click
+    }
+
+    //API
+    function changeImage(e) {
+        const inputAvatar = document.getElementById('avatar');
+        setFile(e.target.files[0]); //gabisa
+        console.log(e.target.files[0]);
+        console.log(file);
+        if(file){
+            console.log('sudh ada file. kirim api')
+        }
+    }
+
+    async function load(second) {
+        await new Promise((prom) => setTimeout(prom, second * 1000));
+    }
     function setActive(i) {
         const navTab = document.getElementsByClassName('nav-tab');
         Array.from(navTab).forEach(function (data, index) {
@@ -79,6 +98,7 @@ function Dashboard() {
                 icon: "error"
             }).then(() => {
                 navigate('/login');
+
             })
         } else if (!data && showAlert === false) {
             navigate('/login');
@@ -86,16 +106,17 @@ function Dashboard() {
     }
     return (
         <div>
-            { loading ? (
+            {loading ? (
                 <div className="vh-100 row justify-content-center align-items-center">
                     <Lottie
                         animationData={myLoad} // Animasi JSON
+                        speed='2'
                         loop={true}
                         autoplay={true}
                         style={{ width: '50%', height: '50%' }}
                     />
                 </div>
-            ):(
+            ) : (
                 <div className="row" style={{ minHeight: 100 + 'vh' }}>
                     <div className="col-lg-3 left-bar py-4">
                         <div className="fs40 text-center">inMoney.</div>
@@ -216,7 +237,7 @@ function Dashboard() {
                             <div className="account my-5">
                                 <div className="avatar text-center position-relative">
                                     <img src={user.image} alt="" />
-                                    <div className="position-absolute translate-middle img-icon">
+                                    <div onClick={clickAvatar} className="position-absolute translate-middle img-icon">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 34 34" fill="none">
                                             <path fill-rule="evenodd" clip-rule="evenodd" d="M13.8523 29.75H20.148C24.5694 29.75 26.7808 29.75 28.3689 28.7087C29.0541 28.2596 29.6443 27.6801 30.1057 27.0031C31.1668 25.4447 31.1668 23.273 31.1668 18.9323C31.1668 14.5902 31.1668 12.4199 30.1057 10.8616C29.6443 10.1846 29.0542 9.605 28.3689 9.15591C27.3489 8.48583 26.0711 8.24641 24.1147 8.16141C23.1811 8.16141 22.3778 7.46725 22.1951 6.56766C22.0554 5.90873 21.6925 5.31822 21.1678 4.89593C20.643 4.47364 19.9886 4.24548 19.315 4.25H14.6853C13.2857 4.25 12.0801 5.22041 11.8052 6.56766C11.6225 7.46725 10.8192 8.16141 9.88566 8.16141C7.93066 8.24641 6.65283 8.48725 5.63141 9.15591C4.94662 9.60509 4.35694 10.1847 3.896 10.8616C2.8335 12.4199 2.8335 14.5902 2.8335 18.9323C2.8335 23.273 2.8335 25.4433 3.89458 27.0031C4.35358 27.6774 4.94291 28.2568 5.63141 28.7087C7.2195 29.75 9.43091 29.75 13.8523 29.75ZM17.0002 13.1367C13.7404 13.1367 11.0969 15.7307 11.0969 18.9309C11.0969 22.1326 13.7404 24.7279 17.0002 24.7279C20.2599 24.7279 22.9034 22.1326 22.9034 18.9323C22.9034 15.7307 20.2599 13.1367 17.0002 13.1367ZM17.0002 15.4544C15.0452 15.4544 13.4585 17.0113 13.4585 18.9323C13.4585 20.8519 15.0452 22.4088 17.0002 22.4088C18.9552 22.4088 20.5418 20.8519 20.5418 18.9323C20.5418 17.0113 18.9552 15.4544 17.0002 15.4544ZM23.6897 14.2956C23.6897 13.6552 24.2181 13.1367 24.8712 13.1367H26.4437C27.0953 13.1367 27.6252 13.6552 27.6252 14.2956C27.6222 14.6057 27.4962 14.9019 27.2749 15.1192C27.0537 15.3365 26.7552 15.4571 26.4451 15.4544H24.8712C24.7175 15.4559 24.565 15.4271 24.4225 15.3697C24.2799 15.3123 24.1501 15.2273 24.0404 15.1197C23.9307 15.0121 23.8432 14.8839 23.7831 14.7425C23.7229 14.6011 23.6911 14.4493 23.6897 14.2956Z" fill="black" />
                                         </svg>
@@ -260,6 +281,13 @@ function Dashboard() {
 
                             </div>
                         </div>
+                    </div>
+                    {/* form-input */}
+                    <div className="formhide">
+                        <form onSubmit={changeImage} action="" method='POST' encType='multipart/form-data'>
+                            <input type="file" name="image" id="avatar" onChange={changeImage} />
+                            <input type="submit" id='submit-avatar' hidden/>
+                        </form>
                     </div>
                 </div>
             )}
@@ -310,4 +338,11 @@ function Account() {
         <h1>Delete</h1>
     );
 }
+
+// function formFile(props){
+//     const {handle} = props;
+//     return (
+
+//     )
+// }
 export default Dashboard;
