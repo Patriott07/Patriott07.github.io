@@ -1,3 +1,7 @@
+::-webkit-scrollbar{
+    display: none;
+}
+
 .app {}
 
 .left-bar {
@@ -34,6 +38,13 @@ span.chip {
     font-weight: 500;
     transition: all 0.4s;
 }
+
+.nav-tab:hover{
+    opacity: 0.9;
+    background: #a5a5a5b5;
+}
+
+
 
 svg {
     margin-right: 7px;
@@ -87,6 +98,7 @@ svg {
     max-height: 170px;
     border-radius: 10px;
     background: #D9D9D9;
+
 }
 
 .tab::after {
@@ -128,4 +140,33 @@ svg {
 
 svg:hover{
     cursor: pointer;
+}
+
+/* Dashboard */
+
+.main-carousel{
+    background-color: #A9C6E9;
+    padding: 20px 60px 20px 30px;
+}
+
+.Mybutton2 {
+    border-radius: 12px;
+    color: white !important;
+    background: #1D252D;
+    border: none;
+    transition: all 0.3s;
+}
+
+.Mybutton2:hover::before{
+    content: "-> ";
+    position: absolute;
+    font-weight: 700;
+    left: -30px;
+    top: 8px;
+    font-size: 20px;
+    color: #1D252D;
+}
+
+.Mybutton2:hover {
+    background: #1d252dde;
 }

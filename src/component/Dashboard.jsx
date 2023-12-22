@@ -12,6 +12,7 @@ import Lottie from 'lottie-react';
 import myLoad from '../asset/Load.json'
 
 
+const url = "http://127.0.0.1/API_laravel/public/api";
 
 function Dashboard() {
     const [token, setToken] = useState(Cookies.get('token'));
@@ -31,20 +32,62 @@ function Dashboard() {
     }, []);
 
     //distract
-    function clickAvatar(){
+    function clickAvatar() {
         const icon = document.getElementById('avatar');
         icon.click(); // click
     }
 
     //API
     function changeImage(e) {
-        const inputAvatar = document.getElementById('avatar');
-        setFile(e.target.files[0]); //gabisa
-        console.log(e.target.files[0]);
-        console.log(file);
-        if(file){
-            console.log('sudh ada file. kirim api')
+        const fileForm = e.target.files[0];
+        // console.log(e.target.files[0]);
+        if (fileForm) {
+            Swal.fire({
+                title: "Questions",
+                text: "Yakin ingin mengubah avatar photomu?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, lets do it."
+            }).then((result) => {
+                const idUser = user.id;
+                axios.post(`${url}/users/edit/picture/${idUser}`, {
+                    image: fileForm
+                },
+                    {
+                        headers: {
+                            Authorization: token
+                        }
+                    }
+                ).then((response) => {
+                    console.log(response, idUser);
+                }).catch((error) => {
+                    console.log(error, idUser);
+                })
+            });
         }
+    }
+
+    function submitChangeAvatar(e){
+        e.preventDefault();
+        const idUser = user.id;
+        // const fileForm = document.getElementById('avatar');
+        // console.log(fileForm.files[0]);
+                axios.post(`${url}/users/edit/picture/${idUser}`, {
+                    image : document.querySelector('#avatar').files
+                },
+                    {
+                        headers: {
+                            Authorization: token,
+                            'Content-Type': 'multipart/form-data',
+                        }
+                    }
+                ).then((response) => {
+                    console.log('suc',response, idUser,token);
+                }).catch((error) => {
+                    console.log('error',error, idUser, token);
+                })
     }
 
     async function load(second) {
@@ -59,6 +102,9 @@ function Dashboard() {
         navTab[i].classList.add('nav-tab-active');
 
         setPage(i);
+        if (i === 4) {
+            navigate('/');
+        }
     }
 
     function setPage(page) {
@@ -67,7 +113,7 @@ function Dashboard() {
 
     function page(page) {
         if (page === 0) {
-            return <DashboardSlice />
+            return <DashboardSlice page='Dashboard' />
         } else if (page === 1) {
             return <HistorySlice />
         } else if (page === 2) {
@@ -115,6 +161,7 @@ function Dashboard() {
                         autoplay={true}
                         style={{ width: '50%', height: '50%' }}
                     />
+
                 </div>
             ) : (
                 <div className="row" style={{ minHeight: 100 + 'vh' }}>
@@ -254,7 +301,7 @@ function Dashboard() {
                                         </span>
                                     </span>
                                     <div className="mt-2 fs14 b tGray">
-                                        Role Admin
+                                        Role {user.role}
                                     </div>
                                     <div className="des mt-3 p-3">
                                         Lorem ipsum dolor sit amet consectetur, adipisicing elit. Labore neque earum debitis id similique maxime, provident veniam inventore nemo. Voluptatibus ea molestiae id quo molestias veniam maiores minima atque magnam?
@@ -284,9 +331,10 @@ function Dashboard() {
                     </div>
                     {/* form-input */}
                     <div className="formhide">
-                        <form onSubmit={changeImage} action="" method='POST' encType='multipart/form-data'>
-                            <input type="file" name="image" id="avatar" onChange={changeImage} />
-                            <input type="submit" id='submit-avatar' hidden/>
+                        <form onSubmit={submitChangeAvatar} encType='multipart/form-data'>
+                            {/* <input type="file" name="image" id="avatar" onChange={changeImage} /> */}
+                            <input type="file" name="image" id="avatar" />
+                            <input type="submit" id='submit-avatar'/>
                         </form>
                     </div>
                 </div>
@@ -295,50 +343,70 @@ function Dashboard() {
     )
 }
 
-function DashboardSlice() {
-    console.log('dashboard');
+function DashboardSlice(props) {
+    // console.log('dashboard');
+    const { page } = props;
+    const navigate = useNavigate();
     return (
-        <>
-            <h1>Dashboard</h1>
-        </>
+        <div className='container my-4'>
+            <span className="chip mb-5">{page}</span>
+            <div className="fs20 b mb-3 mt-2">Hello good morning, Ipsum.</div>
+            <div className="container-task">
+                <div className="main-carousel">
+                    <div className="fs27 mb-3">Lets Join us!</div>
+                    <div className="fs20 mb-4 b">Temukan komunitas yang positif. cari tips bahkan relasi secara cepat. kami menyediakan fitur community untukmu.</div>
+                    <div className="text-end">
+                        <Mybutton type='button' value='Ayo, mulai sekarang!' event={() => { navigate('/dashboard') }} fixClass='Mybutton2' clas='px-3 py-2 position-relative mb-3' />
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }
-function HistorySlice() {
+function HistorySlice(props) {
     return (
         <h1>History</h1>
     );
 }
-function SearchSlice() {
+function SearchSlice(props) {
     return (
         <h1>Search</h1>
     );
 }
-function DeletedSlice() {
+function DeletedSlice(props) {
     return (
         <h1>Delete</h1>
     );
 }
-function AboutUs() {
+function AboutUs(props) {
     return (
         <h1>Delete</h1>
     );
 }
-function Community() {
+function Community(props) {
     return (
         <h1>Delete</h1>
     );
 }
-function ExploreQoute() {
+function ExploreQoute(props) {
     return (
         <h1>Delete</h1>
     );
 }
-function Account() {
+function Account(props) {
     return (
         <h1>Delete</h1>
     );
 }
 
+function Mybutton(props) {
+    const { value, type, clas, fixClass, event = null } = props;
+    return (
+        <button className={`${clas} ${fixClass}`} onClick={event} type={type} >
+            <span>{value}</span>
+        </button>
+    );
+}
 // function formFile(props){
 //     const {handle} = props;
 //     return (
