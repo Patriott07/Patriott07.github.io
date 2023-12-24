@@ -3,6 +3,8 @@ import 'https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.j
 import 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Navigate, useNavigate } from 'react-router-dom';
+import Form from 'react-bootstrap/Form';
+import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import { useState } from 'react';
 import axios from 'axios';
 import { useEffect } from 'react';
@@ -23,18 +25,36 @@ function Dashboard() {
     const [file, setFile] = useState(null);
     const navigate = useNavigate();
 
-    // 
     useEffect(function () {
         // Panggil getDataFeedback saat komponen di-mount
+        // setLoading(true);
         async function start() {
-            await redirectLogin(token, false);
-            console.log(user);
-            await getLastPengeluaran(token);
-            await getQouteRandom(token)
-            setLoading(false);
+            try {
+                await switchLoad(true);
+                console.log(loading);
+                await redirectLogin(token, false);
+                console.log(user);
+                await getLastPengeluaran(token);
+                await getQouteRandom(token);
+                load(2);
+                await switchLoad(false);
+                console.log(loading);
+            } catch (error) {
+
+            }
+
         }
         start();
     }, []);
+
+    // loading : 
+    function switchLoad(costum = null) {
+        if (costum != null) {
+            setLoading(costum)
+        } else {
+            setLoading(!loading);
+        }
+    }
 
     // var per page 
     // Dashboard : 
@@ -42,7 +62,9 @@ function Dashboard() {
     const [dataLastPengeluaran, setDataLastPengeluaran] = useState([]);
     //handle API Dashboard : 
     function getLastPengeluaran(token) {
+        // switchLoad();
         if (token) {
+            // switchLoad();
             axios.get(`${url}/pengeluaran/last/${user.id}`, {},
                 {
                     headers: {
@@ -51,6 +73,7 @@ function Dashboard() {
                 }).then((response) => {
                     // console.log(response.data.data)
                     setDataLastPengeluaran(response.data.data);
+                    // switchLoad();
 
                 }).catch(error => {
                     console.log(error);
@@ -60,6 +83,7 @@ function Dashboard() {
 
     function getQouteRandom(token) {
         if (token) {
+            // switchLoad();
             axios.get(`${url}/qoutes/5`, {}, {
                 headers: {
                     Authorization: token
@@ -67,10 +91,18 @@ function Dashboard() {
             }).then(response => {
                 // console.log(response)
                 setDataQouteDashboard(response.data);
+                // switchLoad();
             })
         }
     }
 
+
+    //History : 
+
+
+    // Search : 
+
+    const [maxShow, setMaxShow] = useState(20);
 
 
     //distract
@@ -159,7 +191,7 @@ function Dashboard() {
         } else if (page === 1) {
             return <HistorySlice page='History Pengeluaran' />
         } else if (page === 2) {
-            return <SearchSlice />
+            return <SearchSlice page='Search Pengeluaran' maxShow={maxShow} />
         } else if (page === 3) {
             return <DeletedSlice />
         } else if (page === 4) {
@@ -507,17 +539,127 @@ function DashboardSlice(props) {
     );
 }
 function HistorySlice(props) {
-    const {page} = props;
+    const { page } = props;
     return (
         <div className='my-4 container'>
             <span className="chip mb-5">{page}</span>
-            {/* <MyCard  title={} des={} price={} date={} categ={} /> */}
+            <div className="row justify-content-between align-items-end mt-3">
+                <div className="col-lg-7 col-6">
+                    <div className="fs27 b mt-4">History pengeluaran anda.</div>
+                    <div className="fs14">Disni adalh tempat dimana pengeluaran anda dikelola. urutkan sesuai kebutuhanmu di pojok kanan</div>
+                </div>
+                <div className="col-lg-3 col-4">
+                    <FloatingLabel controlId="floatingSelect" label="Urutkan saya Dari :">
+                        <Form.Select aria-label="Floating label select example">
+                            <option value="1">Terbaru</option>
+                            <option value="2">Terlama</option>
+                        </Form.Select>
+                    </FloatingLabel>
+                </div>
+                <div className="content-container mt-4">
+
+                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
+
+                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
+
+                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
+                </div>
+                <div className="my-5 text-center">
+                    <span className="load-more">
+                        <span>Show me More</span>
+                    </span>
+                </div>
+            </div>
         </div>
     );
 }
 function SearchSlice(props) {
+    const { page, handleF1, handleF2, handleF3, maxShow } = props;
+    const [toggleFilter, setToggleFilter] = useState(1);
+
+    function toggleFilterFunc(filter) {
+        setToggleFilter(filter);
+    }
+
+    function showedPage(filterpage) {
+        // console.log(filterpage);
+        if (filterpage == 1) {
+            return (
+                <div>
+
+                    <div className='row gap-3 mt-3'>
+                        <div className="col-lg-6 row justify-content-center align-items-center">
+                            <div className="col-10">
+                                <FloatingLabel
+                                    controlId="floatingInput"
+                                    label="Type something here"
+                                    className=""
+                                >
+                                    <Form.Control type="text" placeholder="name@example.com" />
+                                </FloatingLabel>
+                            </div>
+                            <div className="col-2">
+                                <div className="search">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M11 2C9.56238 2.00016 8.14571 2.3447 6.86859 3.00479C5.59146 3.66489 4.49105 4.62132 3.65947 5.79402C2.82788 6.96672 2.28933 8.32158 2.08889 9.74516C1.88844 11.1687 2.03194 12.6196 2.50738 13.9764C2.98281 15.3331 3.77634 16.5562 4.82154 17.5433C5.86673 18.5304 7.13318 19.2527 8.51487 19.6498C9.89656 20.0469 11.3533 20.1073 12.7631 19.8258C14.1729 19.5443 15.4947 18.9292 16.618 18.032L20.293 21.707C20.4816 21.8892 20.7342 21.99 20.9964 21.9877C21.2586 21.9854 21.5094 21.8802 21.6948 21.6948C21.8802 21.5094 21.9854 21.2586 21.9877 20.9964C21.99 20.7342 21.8892 20.4816 21.707 20.293L18.032 16.618C19.09 15.2939 19.7526 13.6979 19.9435 12.0138C20.1344 10.3297 19.8459 8.62586 19.1112 7.0985C18.3764 5.57113 17.2253 4.28228 15.7904 3.38029C14.3554 2.47831 12.6949 1.99985 11 2ZM5 11C5 10.2121 5.1552 9.43185 5.45673 8.7039C5.75825 7.97595 6.20021 7.31451 6.75736 6.75736C7.31451 6.20021 7.97595 5.75825 8.7039 5.45672C9.43186 5.15519 10.2121 5 11 5C11.7879 5 12.5682 5.15519 13.2961 5.45672C14.0241 5.75825 14.6855 6.20021 15.2426 6.75736C15.7998 7.31451 16.2418 7.97595 16.5433 8.7039C16.8448 9.43185 17 10.2121 17 11C17 12.5913 16.3679 14.1174 15.2426 15.2426C14.1174 16.3679 12.5913 17 11 17C9.4087 17 7.88258 16.3679 6.75736 15.2426C5.63214 14.1174 5 12.5913 5 11Z" fill="black" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-4">
+                        <div className="fs14">Or choose the category below :</div>
+                        <div className="justify-content-center gap-3 category-container py-3">
+                            <span className="chip gap-2">Gaming</span>
+                            <span className="chip gap-2">Gaming</span>
+                            <span className="chip gap-2">Gaming</span>
+                            <span className="chip gap-2">Gaming</span>
+                        </div>
+                    </div>
+                    <hr />
+                    <div className="content-container mt-3">
+                        <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
+                    </div>
+                </div>
+            );
+        } else if (filterpage == 2) {
+            return (
+                <div>
+
+                </div>
+            );
+        } else if (filterpage == 3) {
+            return (
+                <div>
+                    filter 3
+                </div>
+            );
+        }
+    }
     return (
-        <h1>Search</h1>
+        // <h1>Search</h1>
+        <div className="container my-4">
+            <span className="chip mb-5">{page}</span>
+            <div className="row justify-content-between align-items-end">
+                <div className="col-lg-8 col-6">
+                    <div className="fs27 b mt-4">Temukan pengeluaran anda.</div>
+                    <div className="fs14 mt-2">Disni adalh tempat dimana anda dapat mencari data pengeluaran anda secara spesifik.</div>
+                </div>
+                <div className="col-lg-3 col-4">
+                    <FloatingLabel controlId="floatingSelect" label="Urutkan saya Dari :">
+                        <Form.Select onChange={(e) => { setToggleFilter(e.target.value) }} aria-label="Floating label select example">
+                            <option value="1">Search By title, description or category</option>
+                            <option value="2">Search By Much Money</option>
+                            <option value="3">Search By Date</option>
+                        </Form.Select>
+                    </FloatingLabel>
+                </div>
+            </div>
+            <div className="row">
+                {showedPage(toggleFilter)}
+            </div>
+        </div>
+
     );
 }
 function DeletedSlice(props) {
@@ -558,7 +700,7 @@ function Mybutton(props) {
 function MyCard(props) {
     const { title, des, price, date, categ, handle } = props;
     return (
-        <div className="myCard" >
+        <div className="myCard mb-3" >
             <div className="row">
                 <div className="col-lg-6">
                     <span className="date fs14">{date}</span>

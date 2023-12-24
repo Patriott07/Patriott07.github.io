@@ -14,6 +14,7 @@
 
 .main-content {
     background: #F6F6F6;
+    border: 1px solid rgba(0, 0, 0, 0.20);
 }
 
 span.chip {
@@ -206,17 +207,17 @@ svg:hover {
     transition: all 0.6s;
 }
 
-.myCard:hover{
+.myCard:hover {
     background: #46454578;
 }
 
-.date{
-    opacity: 0;
+.date {
+    opacity: 0.5;
     transform: translateY(-50);
     transition: all 0.3s;
 }
 
-.myCard:hover .date{
+.myCard:hover .date {
     opacity: 1;
     margin-left: 5px;
 }
@@ -231,7 +232,99 @@ svg:hover {
 
 .price {
     border-radius: 5px;
-    background: #1D252D!important;
+    background: #1D252D !important;
     padding: 3px 3px;
     color: white;
+}
+
+/* History */
+
+.content-container .myCard {
+    position: relative;
+    transition: all 0.4s;
+    background: #D9D9D9 !important;
+}
+
+.content-container .myCard::before {
+    content: "";
+    width: 30%;
+    height: 0;
+    transition: all 0.2s;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+.content-container .myCard:hover::before {
+    content: "Click me. for detail pengeluaran";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 30%;
+    height: 100%;
+    padding: 5%;
+    font-size: 20px;
+    font-weight: 700;
+    background-color: #161819;
+    color: white;
+}
+
+.load-more {
+    position: relative;
+    background: white;
+    color: #161819;
+    padding: 10px;
+    transition: all 0.3s;
+}
+
+.load-more:hover span {
+    position: relative;
+    color: #F4F8FC;
+    z-index: 10 !important;
+}
+
+.load-more::before {
+    content: "";
+    background-color: #161819;
+    color: #F4F8FC;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5%;
+    transition: all 0.3s;
+    z-index: 0;
+}
+
+.load-more:hover::before {
+    height: 100%;
+    z-index: 0;
+}
+
+/* Search */
+.search {
+    border-radius: 20px;
+    background: #D9D9D9;
+    padding: 50% 50%;
+    width: 70px;
+    height: 70%;
+    transition: all 0.4s;
+}
+
+.search:hover {
+    background: #1D252D;
+}
+
+.search:hover path{
+    fill: #D9D9D9;
+}
+
+.category-container span.chip{
+    margin: 2px;
+    padding: 5px 8px;
+}
+
+.category-container span.chip:hover{
+    opacity: 0.8;
+    cursor: pointer;
 }
