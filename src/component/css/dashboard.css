@@ -1,4 +1,4 @@
-::-webkit-scrollbar{
+::-webkit-scrollbar {
     display: none;
 }
 
@@ -39,7 +39,7 @@ span.chip {
     transition: all 0.4s;
 }
 
-.nav-tab:hover{
+.nav-tab:hover {
     opacity: 0.9;
     background: #a5a5a5b5;
 }
@@ -112,6 +112,7 @@ svg {
     background: rgba(59, 74, 91, 0.90);
     transition: all 0.6s;
 }
+
 .tab:hover::after {
     content: "";
     width: 40px;
@@ -119,32 +120,33 @@ svg {
     border-radius: 8px 0px;
 }
 
-.selengkapnya{
+.selengkapnya {
     opacity: 0;
     transform: translateY(-20px);
     transition: all 0.4s;
 }
-.tab:hover .selengkapnya{
+
+.tab:hover .selengkapnya {
     opacity: 1;
     transform: translateY(0);
 }
 
-.selengkapnya:hover{
+.selengkapnya:hover {
     margin-left: 8px;
 }
 
-.load{
+.load {
     width: 300px;
     height: 300px;
 }
 
-svg:hover{
+svg:hover {
     cursor: pointer;
 }
 
 /* Dashboard */
 
-.main-carousel{
+.main-carousel {
     background-color: #A9C6E9;
     padding: 20px 60px 20px 30px;
 }
@@ -157,7 +159,7 @@ svg:hover{
     transition: all 0.3s;
 }
 
-.Mybutton2:hover::before{
+.Mybutton2:hover::before {
     content: "-> ";
     position: absolute;
     font-weight: 700;
@@ -169,4 +171,67 @@ svg:hover{
 
 .Mybutton2:hover {
     background: #1d252dde;
+}
+
+.card-feature {
+    border-radius: 5px;
+    background: var(--Adrift-on-the-Nile-700, #7693B6);
+    padding: 5px;
+    position: relative;
+    transition: all 0.4s;
+}
+
+.card-feature .inner {
+    border-radius: 5px;
+    background: var(--Adrift-on-the-Nile-1000, #1D252D);
+    padding: 15px;
+    color: #F6F6F6;
+    transition: all 0.4s;
+    /* font-weight: ; */
+}
+
+.card-feature:hover {
+    padding: 5px 30% 5px 5px;
+}
+
+.card-feature:hover .inner {
+    background: var(--Adrift-on-the-Nile-1000, #1d252de4);
+}
+
+.myCard {
+    background: #D9D9D9;
+    color: black;
+    padding: 25px;
+    border-radius: 5px;
+    transition: all 0.6s;
+}
+
+.myCard:hover{
+    background: #46454578;
+}
+
+.date{
+    opacity: 0;
+    transform: translateY(-50);
+    transition: all 0.3s;
+}
+
+.myCard:hover .date{
+    opacity: 1;
+    margin-left: 5px;
+}
+
+.myCard .chip {
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background: var(--Adrift-on-the-Nile-900, #3B4A5B);
+    color: var(--Adrift-on-the-Nile-100, #F4F8FC);
+}
+
+.price {
+    border-radius: 5px;
+    background: #1D252D!important;
+    padding: 3px 3px;
+    color: white;
 }

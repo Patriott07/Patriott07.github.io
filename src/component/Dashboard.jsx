@@ -10,26 +10,68 @@ import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
 import Lottie from 'lottie-react';
 import myLoad from '../asset/Load.json'
+import finding from '../image/findng.gif';
 
 
 const url = "http://127.0.0.1/API_laravel/public/api";
 
 function Dashboard() {
     const [token, setToken] = useState(Cookies.get('token'));
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(JSON.parse(Cookies.get('detailUser')));
     const [pageSlice, setPageSlice] = useState(0);
     const [loading, setLoading] = useState(true);
     const [file, setFile] = useState(null);
     const navigate = useNavigate();
+
+    // 
     useEffect(function () {
         // Panggil getDataFeedback saat komponen di-mount
-        redirectLogin(token, false);
-        load(2).then(() => {
-            setUser(JSON.parse(Cookies.get('detailUser')));
-            setLoading(false);
+        async function start() {
+            await redirectLogin(token, false);
             console.log(user);
-        })
+            await getLastPengeluaran(token);
+            await getQouteRandom(token)
+            setLoading(false);
+        }
+        start();
     }, []);
+
+    // var per page 
+    // Dashboard : 
+    const [dataQouteDashboard, setDataQouteDashboard] = useState([]);
+    const [dataLastPengeluaran, setDataLastPengeluaran] = useState([]);
+    //handle API Dashboard : 
+    function getLastPengeluaran(token) {
+        if (token) {
+            axios.get(`${url}/pengeluaran/last/${user.id}`, {},
+                {
+                    headers: {
+                        Authorization: token
+                    }
+                }).then((response) => {
+                    // console.log(response.data.data)
+                    setDataLastPengeluaran(response.data.data);
+
+                }).catch(error => {
+                    console.log(error);
+                })
+        }
+    }
+
+    function getQouteRandom(token) {
+        if (token) {
+            axios.get(`${url}/qoutes/5`, {}, {
+                headers: {
+                    Authorization: token
+                }
+            }).then(response => {
+                // console.log(response)
+                setDataQouteDashboard(response.data);
+            })
+        }
+    }
+
+
 
     //distract
     function clickAvatar() {
@@ -69,25 +111,25 @@ function Dashboard() {
         }
     }
 
-    function submitChangeAvatar(e){
+    function submitChangeAvatar(e) {
         e.preventDefault();
         const idUser = user.id;
         // const fileForm = document.getElementById('avatar');
         // console.log(fileForm.files[0]);
-                axios.post(`${url}/users/edit/picture/${idUser}`, {
-                    image : document.querySelector('#avatar').files
-                },
-                    {
-                        headers: {
-                            Authorization: token,
-                            'Content-Type': 'multipart/form-data',
-                        }
-                    }
-                ).then((response) => {
-                    console.log('suc',response, idUser,token);
-                }).catch((error) => {
-                    console.log('error',error, idUser, token);
-                })
+        axios.post(`${url}/users/edit/picture/${idUser}`, {
+            image: document.querySelector('#avatar').files
+        },
+            {
+                headers: {
+                    Authorization: token,
+                    'Content-Type': 'multipart/form-data',
+                }
+            }
+        ).then((response) => {
+            console.log('suc', response, idUser, token);
+        }).catch((error) => {
+            console.log('error', error, idUser, token);
+        })
     }
 
     async function load(second) {
@@ -113,9 +155,9 @@ function Dashboard() {
 
     function page(page) {
         if (page === 0) {
-            return <DashboardSlice page='Dashboard' />
+            return <DashboardSlice page='Dashboard' data={dataLastPengeluaran} />
         } else if (page === 1) {
-            return <HistorySlice />
+            return <HistorySlice page='History Pengeluaran' />
         } else if (page === 2) {
             return <SearchSlice />
         } else if (page === 3) {
@@ -161,7 +203,6 @@ function Dashboard() {
                         autoplay={true}
                         style={{ width: '50%', height: '50%' }}
                     />
-
                 </div>
             ) : (
                 <div className="row" style={{ minHeight: 100 + 'vh' }}>
@@ -309,21 +350,45 @@ function Dashboard() {
                                 </div>
 
                                 <hr />
+                                <div className="fs18 mb-3 b">Qoute of the day :</div>
+                                <div className="tips-daily d-flex-column justify-content-center mt-2">
+                                    {dataQouteDashboard.length > 0 ? (
 
-                                <div className="tips-daily d-flex justify-content-center mt-2">
-                                    <div className="tab position-relative">
-                                        <div className="author fs14 tGray mb-1">
-                                            ~ Leviathan
-                                        </div>
-                                        <div className="text fs14">
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto corrupti facilis magni aliquam totam deleniti!
-                                        </div>
-                                        <div className="selengkapnya mt-3 fs16 b">
-                                            <a href="">
-                                                Selengkapnya
-                                            </a>
-                                        </div>
-                                    </div>
+                                        dataQouteDashboard.map(function (response, index) {
+                                            console.log(response);
+                                            return (
+                                                <div className="tab position-relative mb-3">
+                                                    <div className="author fs14 tGray mb-1">
+                                                        ~ {response.relationuser.name}
+                                                    </div>
+                                                    <div className="text fs14">
+                                                        {response.content}
+                                                    </div>
+                                                    <div className="selengkapnya mt-3 fs16 b">
+                                                        <a href="">
+                                                            Selengkapnya
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })
+                                    )
+                                        : (
+                                            <div className="tab position-relative">
+                                                <div className="author fs14 tGray mb-1">
+                                                    ~ Leviathan
+                                                </div>
+                                                <div className="text fs14">
+                                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto corrupti facilis magni aliquam totam deleniti!
+                                                </div>
+                                                <div className="selengkapnya mt-3 fs16 b">
+                                                    <a href="">
+                                                        Selengkapnya
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        )}
+
                                 </div>
 
                             </div>
@@ -333,25 +398,26 @@ function Dashboard() {
                     <div className="formhide">
                         <form onSubmit={submitChangeAvatar} encType='multipart/form-data'>
                             {/* <input type="file" name="image" id="avatar" onChange={changeImage} /> */}
-                            <input type="file" name="image" id="avatar" />
-                            <input type="submit" id='submit-avatar'/>
+                            <input type="file" name="image" id="avatar" hidden />
+                            <input type="submit" id='submit-avatar' hidden />
                         </form>
                     </div>
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     )
 }
 
 function DashboardSlice(props) {
     // console.log('dashboard');
-    const { page } = props;
+    const { page, data } = props;
     const navigate = useNavigate();
     return (
         <div className='container my-4'>
             <span className="chip mb-5">{page}</span>
-            <div className="fs20 b mb-3 mt-2">Hello good morning, Ipsum.</div>
-            <div className="container-task">
+            <div className="fs20 b mt-2">Hello good morning, Ipsum.</div>
+            <div className="container-task my-3">
                 <div className="main-carousel">
                     <div className="fs27 mb-3">Lets Join us!</div>
                     <div className="fs20 mb-4 b">Temukan komunitas yang positif. cari tips bahkan relasi secara cepat. kami menyediakan fitur community untukmu.</div>
@@ -360,12 +426,93 @@ function DashboardSlice(props) {
                     </div>
                 </div>
             </div>
+            <div className="box-container-feature mb-4">
+                <div className="row justify-content-around">
+                    <div className="col-lg-6 p-2">
+                        <div className="card-feature">
+                            <div className="inner">
+                                <svg className='fill ms-2' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="">
+                                    <path d="M14 16H16V14H18V12H16V10H14V12H12V14H14V16ZM4 20C3.45 20 2.97933 19.8043 2.588 19.413C2.19667 19.0217 2.00067 18.5507 2 18V6C2 5.45 2.196 4.97933 2.588 4.588C2.98 4.19667 3.45067 4.00067 4 4H10L12 6H20C20.55 6 21.021 6.196 21.413 6.588C21.805 6.98 22.0007 7.45067 22 8V18C22 18.55 21.8043 19.021 21.413 19.413C21.0217 19.805 20.5507 20.0007 20 20H4Z" fill="white" />
+                                </svg>
+                                <span className="fs20">
+                                    Create new
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div className="col-lg-6 p-2">
+                        <div className="card-feature">
+                            <div className="inner">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 8V12L14 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M3.0498 11C3.2739 8.80006 4.30007 6.75962 5.93254 5.26797C7.56501 3.77633 9.6895 2.93789 11.9007 2.91264C14.1119 2.88738 16.255 3.67707 17.9211 5.13104C19.5872 6.58501 20.6597 8.60149 20.934 10.7957C21.2083 12.99 20.6651 15.2084 19.4082 17.0278C18.1512 18.8471 16.2684 20.14 14.1191 20.6599C11.9697 21.1797 9.70421 20.89 7.7548 19.8461C5.80539 18.8022 4.30853 17.0771 3.5498 15M3.0498 20V15H8.0498" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <span className="fs20">
+                                    My history
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-lg-6 p-2">
+                        <div className="card-feature">
+                            <div className="inner">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M4.5 4.5C4.5 3.70435 4.81607 2.94129 5.37868 2.37868C5.94129 1.81607 6.70435 1.5 7.5 1.5C8.29565 1.5 9.05871 1.81607 9.62132 2.37868C10.1839 2.94129 10.5 3.70435 10.5 4.5C10.5 5.29565 10.1839 6.05871 9.62132 6.62132C9.05871 7.18393 8.29565 7.5 7.5 7.5C6.70435 7.5 5.94129 7.18393 5.37868 6.62132C4.81607 6.05871 4.5 5.29565 4.5 4.5ZM14.6685 6.876L14.7315 6.924C15.3679 7.39576 16.1651 7.59663 16.9491 7.48277C17.7331 7.36891 18.4403 6.94956 18.9162 6.31625C19.3922 5.68294 19.5983 4.88708 19.4896 4.10235C19.3809 3.31762 18.9663 2.60774 18.3361 2.12762C17.7059 1.6475 16.9115 1.43612 16.126 1.53963C15.3406 1.64313 14.628 2.0531 14.1437 2.68007C13.6595 3.30705 13.4428 4.10012 13.5412 4.88621C13.6395 5.67231 14.0447 6.3876 14.6685 6.876ZM9.402 9C9.5904 8.64325 9.84883 8.32816 10.1618 8.07359C10.4748 7.81901 10.8359 7.63019 11.2236 7.5184C11.6112 7.40662 12.0174 7.37417 12.4179 7.42301C12.8184 7.47184 13.2049 7.60095 13.5544 7.80262C13.9038 8.00428 14.2089 8.27436 14.4516 8.59668C14.6942 8.91901 14.8694 9.28696 14.9665 9.67854C15.0637 10.0701 15.0808 10.4773 15.017 10.8756C14.9532 11.274 14.8096 11.6554 14.595 11.997C14.1821 12.6542 13.5305 13.1258 12.7772 13.3127C12.0239 13.4996 11.2275 13.3872 10.5552 12.9993C9.88301 12.6113 9.3873 11.9779 9.17225 11.2322C8.9572 10.4864 9.03955 9.68632 9.402 9ZM3.75 9H7.755C7.48841 9.76134 7.43045 10.5801 7.58712 11.3714C7.7438 12.1627 8.10941 12.8977 8.646 13.5H8.25C7.47666 13.4999 6.72217 13.7388 6.08983 14.184C5.45748 14.6292 4.97817 15.2589 4.7175 15.987C4.214 15.7847 3.74257 15.5104 3.318 15.1725C2.19 14.265 1.5 12.924 1.5 11.25C1.5 10.6533 1.73705 10.081 2.15901 9.65901C2.58097 9.23705 3.15326 9 3.75 9ZM15.75 13.5C17.3775 13.5 18.7635 14.5365 19.2825 15.987C19.7925 15.7785 20.2635 15.507 20.682 15.1725C21.81 14.265 22.5 12.924 22.5 11.25C22.5 10.6533 22.2629 10.081 21.841 9.65901C21.419 9.23705 20.8467 9 20.25 9H16.245C16.41 9.4695 16.5 9.975 16.5 10.5C16.5014 11.6072 16.0932 12.6757 15.354 13.5H15.75ZM17.8305 16.392C17.94 16.656 18 16.947 18 17.25C18 18.924 17.3115 20.265 16.182 21.1725C15.0705 22.065 13.5795 22.5 12 22.5C10.4205 22.5 8.9295 22.065 7.818 21.1725C6.69 20.265 6 18.924 6 17.25C5.99921 16.9543 6.05687 16.6614 6.16966 16.388C6.28245 16.1147 6.44815 15.8663 6.65724 15.6572C6.86633 15.4482 7.11469 15.2825 7.38803 15.1697C7.66137 15.0569 7.9543 14.9992 8.25 15H15.75C16.1957 14.9999 16.6313 15.1321 17.0017 15.38C17.3721 15.6278 17.6606 15.98 17.8305 16.392Z" fill="white" />
+                                </svg>
+                                <span className="fs20">
+                                    Community
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-lg-6 p-2">
+                        <div className="card-feature">
+                            <div className="inner">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 22C10.6167 22 9.31667 21.7373 8.1 21.212C6.88333 20.6867 5.825 19.9743 4.925 19.075C4.025 18.175 3.31267 17.1167 2.788 15.9C2.26333 14.6833 2.00067 13.3833 2 12C2 10.6167 2.26267 9.31667 2.788 8.1C3.31333 6.88333 4.02567 5.825 4.925 4.925C5.825 4.025 6.88333 3.31267 8.1 2.788C9.31667 2.26333 10.6167 2.00067 12 2C14.4333 2 16.5627 2.76267 18.388 4.288C20.2133 5.81333 21.3507 7.72567 21.8 10.025H19.75C19.4333 8.80833 18.8623 7.721 18.037 6.763C17.2117 5.805 16.1993 5.084 15 4.6V5C15 5.55 14.8043 6.021 14.413 6.413C14.0217 6.805 13.5507 7.00067 13 7H11V9C11 9.28333 10.904 9.521 10.712 9.713C10.52 9.905 10.2827 10.0007 10 10H8V12H10V15H9L4.2 10.2C4.15 10.5 4.10433 10.8 4.063 11.1C4.02167 11.4 4.00067 11.7 4 12C4 14.1833 4.76667 16.0583 6.3 17.625C7.83333 19.1917 9.73333 19.9833 12 20V22ZM21.1 21.5L17.9 18.3C17.55 18.5 17.175 18.6667 16.775 18.8C16.375 18.9333 15.95 19 15.5 19C14.25 19 13.1877 18.5627 12.313 17.688C11.4383 16.8133 11.0007 15.7507 11 14.5C11 13.25 11.4377 12.1877 12.313 11.313C13.1883 10.4383 14.2507 10.0007 15.5 10C16.75 10 17.8127 10.4377 18.688 11.313C19.5633 12.1883 20.0007 13.2507 20 14.5C20 14.95 19.9333 15.375 19.8 15.775C19.6667 16.175 19.5 16.55 19.3 16.9L22.5 20.1L21.1 21.5ZM15.5 17C16.2 17 16.7917 16.7583 17.275 16.275C17.7583 15.7917 18 15.2 18 14.5C18 13.8 17.7583 13.2083 17.275 12.725C16.7917 12.2417 16.2 12 15.5 12C14.8 12 14.2083 12.2417 13.725 12.725C13.2417 13.2083 13 13.8 13 14.5C13 15.2 13.2417 15.7917 13.725 16.275C14.2083 16.7583 14.8 17 15.5 17Z" fill="#D9D9D9" />
+                                </svg>
+                                <span className="fs20">
+                                    Explore now
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {data.length > 0 ? (
+                <div>
+                    <div className="fs20 b text-dark my-3">
+                        Pengeluaran akhir anda.
+                    </div>
+                    {
+                        data.map(function (response, index) {
+                            return (
+                                <MyCard title={response.title} des={response.deskripsi} price={response.uang} categ={response.category} date={response.tanggal} handle='' />
+                            );
+                        })
+                    }
+                </div>
+            ) : (
+                <div className='my-5 text-center'>
+                    <img src={finding} style={{ width: 300 + 'px' }} alt="" />
+                    <div className="fs20 b text-dark text-center my-3">
+                        Tidak dapat menemukan Pengeluaran akhir anda. Ayo buat!
+                    </div>
+                </div>
+            )}
+
+
         </div>
     );
 }
 function HistorySlice(props) {
+    const {page} = props;
     return (
-        <h1>History</h1>
+        <div className='my-4 container'>
+            <span className="chip mb-5">{page}</span>
+            {/* <MyCard  title={} des={} price={} date={} categ={} /> */}
+        </div>
     );
 }
 function SearchSlice(props) {
@@ -407,6 +554,36 @@ function Mybutton(props) {
         </button>
     );
 }
+
+function MyCard(props) {
+    const { title, des, price, date, categ, handle } = props;
+    return (
+        <div className="myCard" >
+            <div className="row">
+                <div className="col-lg-6">
+                    <span className="date fs14">{date}</span>
+                </div>
+                <div className='col-lg-6 text-end'>
+                    <span className="chip category">{categ}</span>
+                </div>
+            </div>
+            <div className="row justify-content-center align-items-end">
+                <div className="col-lg-9 py-2">
+                    <div className="fs27 mb-2">{title}</div>
+                    <div className="fs16">
+                        {des}
+                    </div>
+                </div>
+                <div className="col-lg-3 text-center">
+                    <div className="chip price">
+                        Rp. {price}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 // function formFile(props){
 //     const {handle} = props;
 //     return (
