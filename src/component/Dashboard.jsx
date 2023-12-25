@@ -23,6 +23,7 @@ function Dashboard() {
     const [pageSlice, setPageSlice] = useState(0);
     const [loading, setLoading] = useState(true);
     const [file, setFile] = useState(null);
+    const [offCavas, setOfCanvas] = useState(false);
     const navigate = useNavigate();
 
     useEffect(function () {
@@ -111,6 +112,29 @@ function Dashboard() {
         icon.click(); // click
     }
 
+    function toggleOfCanvas(code, side) {
+        const leftBar = document.getElementById('left-bar');
+        const rightBar = document.getElementById('right-bar');
+        // console.logs(leftBar, code);
+        if (code == 1) {
+            // on
+            if (side == 'left') {
+
+                leftBar.classList.add('active');
+            } else {
+                rightBar.classList.add('active');
+            }
+        } else if (code == 2) {
+            //off
+            if (side == 'left') {
+                leftBar.classList.remove('active');
+            } else {
+                rightBar.classList.remove('active');
+            }
+
+        }
+    }
+
     //API
     function changeImage(e) {
         const fileForm = e.target.files[0];
@@ -187,11 +211,11 @@ function Dashboard() {
 
     function page(page) {
         if (page === 0) {
-            return <DashboardSlice page='Dashboard' data={dataLastPengeluaran} />
+            return <DashboardSlice page='Dashboard' data={dataLastPengeluaran} username={user.name} handleLeftBar={() => toggleOfCanvas(1, 'left')} />
         } else if (page === 1) {
-            return <HistorySlice page='History Pengeluaran' />
+            return <HistorySlice page='History Pengeluaran' handleLeftBar={() => toggleOfCanvas(1, 'left')} />
         } else if (page === 2) {
-            return <SearchSlice page='Search Pengeluaran' maxShow={maxShow} />
+            return <SearchSlice page='Search Pengeluaran' maxShow={maxShow} handleLeftBar={() => toggleOfCanvas(1, 'left')} />
         } else if (page === 3) {
             return <DeletedSlice />
         } else if (page === 4) {
@@ -238,7 +262,12 @@ function Dashboard() {
                 </div>
             ) : (
                 <div className="row" style={{ minHeight: 100 + 'vh' }}>
-                    <div className="col-lg-3 left-bar py-4">
+                    <div className="col-lg-3 left-bar py-4" id='left-bar'>
+                        <div className="d-lg-none">
+                            <svg onClick={() => toggleOfCanvas(2, 'left')} xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none">
+                                <path d="M5 19V8H7V17H16V19H5ZM10 14V3H12V12H21V14H10Z" fill="black" />
+                            </svg>
+                        </div>
                         <div className="fs40 text-center">inMoney.</div>
                         <div className="container mt-5">
                             <div className=''>
@@ -319,7 +348,7 @@ function Dashboard() {
                                     </span>
                                 </div>
 
-                                <div className="nav-tab ms-4 mb-2" onClick={() => { setActive(7) }}>
+                                <div className="nav-tab ms-4 mb-2" onClick={() => toggleOfCanvas(1, 'right')} k>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                         <path className='fill' d="M3 4.995C3 3.893 3.893 3 4.995 3H19.005C20.107 3 21 3.893 21 4.995V19.005C21 19.5341 20.7898 20.0415 20.4157 20.4157C20.0415 20.7898 19.5341 21 19.005 21H4.995C4.46589 21 3.95846 20.7898 3.58432 20.4157C3.21019 20.0415 3 19.5341 3 19.005V4.995ZM6.357 18H17.847C17.2026 17.0734 16.3435 16.3166 15.3431 15.7942C14.3427 15.2717 13.2306 14.9993 12.102 15C10.9734 14.9993 9.86134 15.2717 8.86091 15.7942C7.86048 16.3166 7.00137 17.0734 6.357 18ZM12 13C12.4596 13 12.9148 12.9095 13.3394 12.7336C13.764 12.5577 14.1499 12.2999 14.4749 11.9749C14.7999 11.6499 15.0577 11.264 15.2336 10.8394C15.4095 10.4148 15.5 9.95963 15.5 9.5C15.5 9.04037 15.4095 8.58525 15.2336 8.16061C15.0577 7.73597 14.7999 7.35013 14.4749 7.02513C14.1499 6.70012 13.764 6.44231 13.3394 6.26642C12.9148 6.09053 12.4596 6 12 6C11.0717 6 10.1815 6.36875 9.52513 7.02513C8.86875 7.6815 8.5 8.57174 8.5 9.5C8.5 10.4283 8.86875 11.3185 9.52513 11.9749C10.1815 12.6313 11.0717 13 12 13Z" fill="" />
                                     </svg>
@@ -348,11 +377,16 @@ function Dashboard() {
                             </div>
                         </div>
                     </div>
-                    <div className="col-lg-6 main-content">
+                    <div className="col-lg-6 main-content position-relative">
                         {page(pageSlice)}
                     </div>
-                    <div className="col-lg-3 right-bar">
+                    <div className="col-lg-3 right-bar" id='right-bar'>
                         <div className="container mt-4">
+                            <div className="d-lg-none">
+                                <svg onClick={() => toggleOfCanvas(2, 'right')} xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none">
+                                    <path d="M5 19V8H7V17H16V19H5ZM10 14V3H12V12H21V14H10Z" fill="black" />
+                                </svg>
+                            </div>
                             <span className="chip mb-4">Infomasi akun</span>
                             <div className="account my-5">
                                 <div className="avatar text-center position-relative">
@@ -382,12 +416,12 @@ function Dashboard() {
                                 </div>
 
                                 <hr />
-                                <div className="fs18 mb-3 b">Qoute of the day :</div>
-                                <div className="tips-daily d-flex-column justify-content-center mt-2">
+                                <div className="fs18 mb-3 text-lg-start text-center  b">Qoute of the day :</div>
+                                <div className="tips-daily d-lg-flex-column row  gap-lg-0 gap-4 justify-content-center mt-2">
                                     {dataQouteDashboard.length > 0 ? (
 
                                         dataQouteDashboard.map(function (response, index) {
-                                            console.log(response);
+
                                             return (
                                                 <div className="tab position-relative mb-3">
                                                     <div className="author fs14 tGray mb-1">
@@ -443,12 +477,17 @@ function Dashboard() {
 
 function DashboardSlice(props) {
     // console.log('dashboard');
-    const { page, data } = props;
+    const { page, data, username, handleLeftBar } = props;
     const navigate = useNavigate();
     return (
-        <div className='container my-4'>
+        <div className='container my-5'>
+            <div className="d-lg-none">
+                <svg onClick={handleLeftBar} xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none">
+                    <path d="M17 16V7H8V5H19V16H17ZM12 21V12H3V10H14V21H12Z" fill="black" />
+                </svg>
+            </div>
             <span className="chip mb-5">{page}</span>
-            <div className="fs20 b mt-2">Hello good morning, Ipsum.</div>
+            <div className="fs27 b mt-2">Hello good morning, {username}.</div>
             <div className="container-task my-3">
                 <div className="main-carousel">
                     <div className="fs27 mb-3">Lets Join us!</div>
@@ -539,16 +578,22 @@ function DashboardSlice(props) {
     );
 }
 function HistorySlice(props) {
-    const { page } = props;
+    const { page, handleLeftBar } = props;
     return (
         <div className='my-4 container'>
+            <div className="d-lg-none">
+                <svg onClick={handleLeftBar} xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none">
+                    <path d="M17 16V7H8V5H19V16H17ZM12 21V12H3V10H14V21H12Z" fill="black" />
+                </svg>
+            </div>
+
             <span className="chip mb-5">{page}</span>
-            <div className="row justify-content-between align-items-end mt-3">
-                <div className="col-lg-7 col-6">
+            <div className="row justify-content-between gap-lg-0 gap-3 align-items-end mt-3">
+                <div className="col-lg-7">
                     <div className="fs27 b mt-4">History pengeluaran anda.</div>
                     <div className="fs14">Disni adalh tempat dimana pengeluaran anda dikelola. urutkan sesuai kebutuhanmu di pojok kanan</div>
                 </div>
-                <div className="col-lg-3 col-4">
+                <div className="col-lg-3 col-6">
                     <FloatingLabel controlId="floatingSelect" label="Urutkan saya Dari :">
                         <Form.Select aria-label="Floating label select example">
                             <option value="1">Terbaru</option>
@@ -574,9 +619,10 @@ function HistorySlice(props) {
     );
 }
 function SearchSlice(props) {
-    const { page, handleF1, handleF2, handleF3 } = props;
-    const [toggleFilter, setToggleFilter] = useState(1);
+    const { page, handleLeftBar } = props;
+    const [toggleFilter, setToggleFilter] = useState(0);
     const [maxShow, setMaxShow] = useState(10);
+    const [showControllerFilter, setShowControllerFilter] = useState(true)
 
     function toggleFilterFunc(filter) {
         setToggleFilter(filter);
@@ -622,8 +668,8 @@ function SearchSlice(props) {
             );
         } else if (filterpage == 2) {
             return (
-                <div className='mt-3 row align-items-center'>
-                    <div className="col-lg-4">
+                <div className='mt-3 row align-items-center justify-content-end gap-lg-0 gap-3'>
+                    <div className="col-lg-4 col-5">
                         <div className="fs14 tGray">
                             from
                         </div>
@@ -631,24 +677,18 @@ function SearchSlice(props) {
                         <Form.Control className='bg-dark text-light my-2' type="number" placeholder="Masukan uang minimal" />
                         <div className="form-text">Masukan jumlah minimal</div>
                     </div>
-                    <span className=" col-lg-1 fs18 text-center b">
+                    <span className=" col-lg-1 col-1 fs18 text-center b">
                         /
                     </span>
-                    <div className="col-lg-4">
+                    <div className="col-lg-4 col-5">
                         <div className="fs14 tGray">
                             to
                         </div>
 
                         <Form.Control className='my-2' type="number" placeholder="" />
-                        <div className="form-text">Masukan jumlah maksimal</div>
+                        <div className="form-text">Masukn jmlah maksimal</div>
                     </div>
-                    {/* <div className="col-2">
-                        <div className="search">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M11 2C9.56238 2.00016 8.14571 2.3447 6.86859 3.00479C5.59146 3.66489 4.49105 4.62132 3.65947 5.79402C2.82788 6.96672 2.28933 8.32158 2.08889 9.74516C1.88844 11.1687 2.03194 12.6196 2.50738 13.9764C2.98281 15.3331 3.77634 16.5562 4.82154 17.5433C5.86673 18.5304 7.13318 19.2527 8.51487 19.6498C9.89656 20.0469 11.3533 20.1073 12.7631 19.8258C14.1729 19.5443 15.4947 18.9292 16.618 18.032L20.293 21.707C20.4816 21.8892 20.7342 21.99 20.9964 21.9877C21.2586 21.9854 21.5094 21.8802 21.6948 21.6948C21.8802 21.5094 21.9854 21.2586 21.9877 20.9964C21.99 20.7342 21.8892 20.4816 21.707 20.293L18.032 16.618C19.09 15.2939 19.7526 13.6979 19.9435 12.0138C20.1344 10.3297 19.8459 8.62586 19.1112 7.0985C18.3764 5.57113 17.2253 4.28228 15.7904 3.38029C14.3554 2.47831 12.6949 1.99985 11 2ZM5 11C5 10.2121 5.1552 9.43185 5.45673 8.7039C5.75825 7.97595 6.20021 7.31451 6.75736 6.75736C7.31451 6.20021 7.97595 5.75825 8.7039 5.45672C9.43186 5.15519 10.2121 5 11 5C11.7879 5 12.5682 5.15519 13.2961 5.45672C14.0241 5.75825 14.6855 6.20021 15.2426 6.75736C15.7998 7.31451 16.2418 7.97595 16.5433 8.7039C16.8448 9.43185 17 10.2121 17 11C17 12.5913 16.3679 14.1174 15.2426 15.2426C14.1174 16.3679 12.5913 17 11 17C9.4087 17 7.88258 16.3679 6.75736 15.2426C5.63214 14.1174 5 12.5913 5 11Z" fill="black" />
-                            </svg>
-                        </div>
-                    </div> */}
+                    
                     <span className="search ms-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                             <path fill-rule="evenodd" clip-rule="evenodd" d="M11 2C9.56238 2.00016 8.14571 2.3447 6.86859 3.00479C5.59146 3.66489 4.49105 4.62132 3.65947 5.79402C2.82788 6.96672 2.28933 8.32158 2.08889 9.74516C1.88844 11.1687 2.03194 12.6196 2.50738 13.9764C2.98281 15.3331 3.77634 16.5562 4.82154 17.5433C5.86673 18.5304 7.13318 19.2527 8.51487 19.6498C9.89656 20.0469 11.3533 20.1073 12.7631 19.8258C14.1729 19.5443 15.4947 18.9292 16.618 18.032L20.293 21.707C20.4816 21.8892 20.7342 21.99 20.9964 21.9877C21.2586 21.9854 21.5094 21.8802 21.6948 21.6948C21.8802 21.5094 21.9854 21.2586 21.9877 20.9964C21.99 20.7342 21.8892 20.4816 21.707 20.293L18.032 16.618C19.09 15.2939 19.7526 13.6979 19.9435 12.0138C20.1344 10.3297 19.8459 8.62586 19.1112 7.0985C18.3764 5.57113 17.2253 4.28228 15.7904 3.38029C14.3554 2.47831 12.6949 1.99985 11 2ZM5 11C5 10.2121 5.1552 9.43185 5.45673 8.7039C5.75825 7.97595 6.20021 7.31451 6.75736 6.75736C7.31451 6.20021 7.97595 5.75825 8.7039 5.45672C9.43186 5.15519 10.2121 5 11 5C11.7879 5 12.5682 5.15519 13.2961 5.45672C14.0241 5.75825 14.6855 6.20021 15.2426 6.75736C15.7998 7.31451 16.2418 7.97595 16.5433 8.7039C16.8448 9.43185 17 10.2121 17 11C17 12.5913 16.3679 14.1174 15.2426 15.2426C14.1174 16.3679 12.5913 17 11 17C9.4087 17 7.88258 16.3679 6.75736 15.2426C5.63214 14.1174 5 12.5913 5 11Z" fill="black" />
@@ -680,20 +720,44 @@ function SearchSlice(props) {
     return (
         // <h1>Search</h1>
         <div className="container my-4">
+            <div className="d-lg-none">
+                <svg onClick={handleLeftBar} xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none">
+                    <path d="M17 16V7H8V5H19V16H17ZM12 21V12H3V10H14V21H12Z" fill="black" />
+                </svg>
+            </div>
             <span className="chip mb-5">{page}</span>
-            <div className="row justify-content-between align-items-end">
-                <div className="col-lg-8 col-6">
+            <div className="row justify-content-lg-between align-items-end justify-content-end">
+                <div className="col-lg-8 col-12">
                     <div className="fs27 b mt-4">Temukan pengeluaran anda.</div>
                     <div className="fs14 mt-2">Disni adalh tempat dimana anda dapat mencari data pengeluaran anda secara spesifik.</div>
                 </div>
-                <div className="col-lg-3 col-4">
-                    <FloatingLabel controlId="floatingSelect" label="Urutkan saya Dari :">
-                        <Form.Select onChange={(e) => { setToggleFilter(e.target.value) }} aria-label="Floating label select example">
-                            <option value="1">Search By title, description or category</option>
-                            <option value="2">Search By Much Money</option>
-                            <option value="3">Search By Date</option>
-                        </Form.Select>
-                    </FloatingLabel>
+                <div className="col-lg-3 col-6">
+                    <div className="form-text text-end e" onClick={()=>setShowControllerFilter(!showControllerFilter)}>
+                    {showControllerFilter ? (
+                        <>
+                        hide me.
+                        </>
+                    ) : (
+                         <>
+                        Show me.
+                        </>
+                    ) }
+                    </div>
+                    {showControllerFilter ? (
+                        <div className="control">
+                            <FloatingLabel controlId="floatingSelect" label="filter saya :">
+                                <Form.Select onChange={(e) => { setToggleFilter(e.target.value) }} aria-label="Floating label select example">
+                                    <option value="1">Search By title, description or category</option>
+                                    <option value="2">Search By Much Money</option>
+                                    <option value="3">Search By Date</option>
+                                </Form.Select>
+                            </FloatingLabel>
+                        </div>
+                    ):(
+                        <>
+                        </>
+                    )}
+
                 </div>
             </div>
             <div className="row">
@@ -704,7 +768,6 @@ function SearchSlice(props) {
                 <div className="col-lg-6 row align-items-center">
                     <span className="col text-end">Show</span>
                     <span className='col'>
-                        {maxShow}
                         <Form.Select onChange={(e) => { setMaxShow(e.target.value) }} aria-label="Floating label select example">
                             <option value="10">10</option>
                             <option value="100">100</option>

@@ -239,7 +239,7 @@ svg:hover {
 
 /* History */
 
-.content-container{
+.content-container {
     min-height: 80vh;
     max-height: 80vh;
     overflow-y: auto;
@@ -354,7 +354,75 @@ svg:hover {
 }
 
 
+.d-lg-none {
+    margin: 10px;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.e{
+    cursor: pointer;
+}
 
 /* .date-picker::-webkit-calendar-picker-indicator {
     display: none;
   }  */
+
+
+/* handphone */
+@media screen and (max-width: 678px) {
+
+    .left-bar , .right-bar {
+        z-index: 30;
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        /* display: none; */
+        transform: translateX(-100%);
+        transition: all 0.3s;
+    }
+
+    .left-bar.active , .right-bar.active {
+        opacity: 1;
+        /* display: none; */
+        transform: translateX(0);
+    }
+
+    .content-container .myCard:hover::before {
+        content: "Click me. for detail pengeluaran";
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 40%;
+        height: 100%;
+        padding: 15% 5%;
+        font-size: 20px;
+        font-weight: 700;
+        background-color: #161819;
+        color: white;
+    }
+
+
+}
+
+/* tablet */
+@media screen and (min-width: 678px) and (max-width: 978px) {
+    .left-bar, .right-bar {
+        z-index: 30;
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        /* display: none; */
+        transform: translateX(-100%);
+        transition: all 0.3s;
+    }
+
+    .left-bar.active, .right-bar.active {
+        opacity: 1;
+        /* display: none; */
+        transform: translateX(0);
+    }
+}
