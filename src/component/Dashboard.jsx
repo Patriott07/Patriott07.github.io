@@ -574,8 +574,9 @@ function HistorySlice(props) {
     );
 }
 function SearchSlice(props) {
-    const { page, handleF1, handleF2, handleF3, maxShow } = props;
+    const { page, handleF1, handleF2, handleF3 } = props;
     const [toggleFilter, setToggleFilter] = useState(1);
+    const [maxShow, setMaxShow] = useState(10);
 
     function toggleFilterFunc(filter) {
         setToggleFilter(filter);
@@ -616,26 +617,66 @@ function SearchSlice(props) {
                             <span className="chip gap-2">Gaming</span>
                         </div>
                     </div>
-                    <hr />
-                    <div className="content-container mt-3">
-                        <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
-                    </div>
+
                 </div>
             );
         } else if (filterpage == 2) {
             return (
-                <div>
+                <div className='mt-3 row align-items-center'>
+                    <div className="col-lg-4">
+                        <div className="fs14 tGray">
+                            from
+                        </div>
 
+                        <Form.Control className='bg-dark text-light my-2' type="number" placeholder="Masukan uang minimal" />
+                        <div className="form-text">Masukan jumlah minimal</div>
+                    </div>
+                    <span className=" col-lg-1 fs18 text-center b">
+                        /
+                    </span>
+                    <div className="col-lg-4">
+                        <div className="fs14 tGray">
+                            to
+                        </div>
+
+                        <Form.Control className='my-2' type="number" placeholder="" />
+                        <div className="form-text">Masukan jumlah maksimal</div>
+                    </div>
+                    {/* <div className="col-2">
+                        <div className="search">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M11 2C9.56238 2.00016 8.14571 2.3447 6.86859 3.00479C5.59146 3.66489 4.49105 4.62132 3.65947 5.79402C2.82788 6.96672 2.28933 8.32158 2.08889 9.74516C1.88844 11.1687 2.03194 12.6196 2.50738 13.9764C2.98281 15.3331 3.77634 16.5562 4.82154 17.5433C5.86673 18.5304 7.13318 19.2527 8.51487 19.6498C9.89656 20.0469 11.3533 20.1073 12.7631 19.8258C14.1729 19.5443 15.4947 18.9292 16.618 18.032L20.293 21.707C20.4816 21.8892 20.7342 21.99 20.9964 21.9877C21.2586 21.9854 21.5094 21.8802 21.6948 21.6948C21.8802 21.5094 21.9854 21.2586 21.9877 20.9964C21.99 20.7342 21.8892 20.4816 21.707 20.293L18.032 16.618C19.09 15.2939 19.7526 13.6979 19.9435 12.0138C20.1344 10.3297 19.8459 8.62586 19.1112 7.0985C18.3764 5.57113 17.2253 4.28228 15.7904 3.38029C14.3554 2.47831 12.6949 1.99985 11 2ZM5 11C5 10.2121 5.1552 9.43185 5.45673 8.7039C5.75825 7.97595 6.20021 7.31451 6.75736 6.75736C7.31451 6.20021 7.97595 5.75825 8.7039 5.45672C9.43186 5.15519 10.2121 5 11 5C11.7879 5 12.5682 5.15519 13.2961 5.45672C14.0241 5.75825 14.6855 6.20021 15.2426 6.75736C15.7998 7.31451 16.2418 7.97595 16.5433 8.7039C16.8448 9.43185 17 10.2121 17 11C17 12.5913 16.3679 14.1174 15.2426 15.2426C14.1174 16.3679 12.5913 17 11 17C9.4087 17 7.88258 16.3679 6.75736 15.2426C5.63214 14.1174 5 12.5913 5 11Z" fill="black" />
+                            </svg>
+                        </div>
+                    </div> */}
+                    <span className="search ms-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M11 2C9.56238 2.00016 8.14571 2.3447 6.86859 3.00479C5.59146 3.66489 4.49105 4.62132 3.65947 5.79402C2.82788 6.96672 2.28933 8.32158 2.08889 9.74516C1.88844 11.1687 2.03194 12.6196 2.50738 13.9764C2.98281 15.3331 3.77634 16.5562 4.82154 17.5433C5.86673 18.5304 7.13318 19.2527 8.51487 19.6498C9.89656 20.0469 11.3533 20.1073 12.7631 19.8258C14.1729 19.5443 15.4947 18.9292 16.618 18.032L20.293 21.707C20.4816 21.8892 20.7342 21.99 20.9964 21.9877C21.2586 21.9854 21.5094 21.8802 21.6948 21.6948C21.8802 21.5094 21.9854 21.2586 21.9877 20.9964C21.99 20.7342 21.8892 20.4816 21.707 20.293L18.032 16.618C19.09 15.2939 19.7526 13.6979 19.9435 12.0138C20.1344 10.3297 19.8459 8.62586 19.1112 7.0985C18.3764 5.57113 17.2253 4.28228 15.7904 3.38029C14.3554 2.47831 12.6949 1.99985 11 2ZM5 11C5 10.2121 5.1552 9.43185 5.45673 8.7039C5.75825 7.97595 6.20021 7.31451 6.75736 6.75736C7.31451 6.20021 7.97595 5.75825 8.7039 5.45672C9.43186 5.15519 10.2121 5 11 5C11.7879 5 12.5682 5.15519 13.2961 5.45672C14.0241 5.75825 14.6855 6.20021 15.2426 6.75736C15.7998 7.31451 16.2418 7.97595 16.5433 8.7039C16.8448 9.43185 17 10.2121 17 11C17 12.5913 16.3679 14.1174 15.2426 15.2426C14.1174 16.3679 12.5913 17 11 17C9.4087 17 7.88258 16.3679 6.75736 15.2426C5.63214 14.1174 5 12.5913 5 11Z" fill="black" />
+                        </svg>
+                    </span>
                 </div>
             );
         } else if (filterpage == 3) {
             return (
-                <div>
-                    filter 3
+                <div className='mt-3'>
+                    <span className="">
+                        <div class="date-picker-container">
+                            <input type="date" className="date-picker" id="datepicker" />
+                        </div>
+                    </span>
+
+                    <span className="search ms-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M11 2C9.56238 2.00016 8.14571 2.3447 6.86859 3.00479C5.59146 3.66489 4.49105 4.62132 3.65947 5.79402C2.82788 6.96672 2.28933 8.32158 2.08889 9.74516C1.88844 11.1687 2.03194 12.6196 2.50738 13.9764C2.98281 15.3331 3.77634 16.5562 4.82154 17.5433C5.86673 18.5304 7.13318 19.2527 8.51487 19.6498C9.89656 20.0469 11.3533 20.1073 12.7631 19.8258C14.1729 19.5443 15.4947 18.9292 16.618 18.032L20.293 21.707C20.4816 21.8892 20.7342 21.99 20.9964 21.9877C21.2586 21.9854 21.5094 21.8802 21.6948 21.6948C21.8802 21.5094 21.9854 21.2586 21.9877 20.9964C21.99 20.7342 21.8892 20.4816 21.707 20.293L18.032 16.618C19.09 15.2939 19.7526 13.6979 19.9435 12.0138C20.1344 10.3297 19.8459 8.62586 19.1112 7.0985C18.3764 5.57113 17.2253 4.28228 15.7904 3.38029C14.3554 2.47831 12.6949 1.99985 11 2ZM5 11C5 10.2121 5.1552 9.43185 5.45673 8.7039C5.75825 7.97595 6.20021 7.31451 6.75736 6.75736C7.31451 6.20021 7.97595 5.75825 8.7039 5.45672C9.43186 5.15519 10.2121 5 11 5C11.7879 5 12.5682 5.15519 13.2961 5.45672C14.0241 5.75825 14.6855 6.20021 15.2426 6.75736C15.7998 7.31451 16.2418 7.97595 16.5433 8.7039C16.8448 9.43185 17 10.2121 17 11C17 12.5913 16.3679 14.1174 15.2426 15.2426C14.1174 16.3679 12.5913 17 11 17C9.4087 17 7.88258 16.3679 6.75736 15.2426C5.63214 14.1174 5 12.5913 5 11Z" fill="black" />
+                        </svg>
+                    </span>
+
+
                 </div>
             );
         }
     }
+
     return (
         // <h1>Search</h1>
         <div className="container my-4">
@@ -657,6 +698,38 @@ function SearchSlice(props) {
             </div>
             <div className="row">
                 {showedPage(toggleFilter)}
+            </div>
+            <hr />
+            <div className="row justify-content-end">
+                <div className="col-lg-6 row align-items-center">
+                    <span className="col text-end">Show</span>
+                    <span className='col'>
+                        {maxShow}
+                        <Form.Select onChange={(e) => { setMaxShow(e.target.value) }} aria-label="Floating label select example">
+                            <option value="10">10</option>
+                            <option value="100">100</option>
+                            <option value="500">500</option>
+                        </Form.Select>
+                    </span>
+                    <span className="col">data</span>
+                </div>
+            </div>
+            <div className="content-container mt-3">
+                <div className="d-flex-column">
+
+                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
+                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
+                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
+                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
+                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
+                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
+                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
+                </div>
+            </div>
+            <div className="my-5 text-center">
+                <span className="load-more">
+                    <span>Scrool Vertical for More</span>
+                </span>
             </div>
         </div>
 
