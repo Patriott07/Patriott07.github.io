@@ -237,6 +237,45 @@ svg:hover {
     color: white;
 }
 
+.myModal {
+    padding: 20px 0px;
+}
+
+.logo {
+    color: #586E88 !important;
+}
+
+.modal-form {
+    border: 1px dashed #000;
+    padding: 20px;
+    position: relative;
+}
+
+.form-dark {
+    padding: 10px;
+    color: #F6F6F6 !important;
+    background: var(--Adrift-on-the-Nile-1000, #1D252D) !important;
+    font-size: 16px;
+}
+
+.form-light{
+    font-size: 16px!important;
+    padding: 10px!important;
+}
+
+.mySubmitForm {
+    border-radius: 12px;
+    background: var(--Adrift-on-the-Nile-1000, #1D252D);
+    padding: 10px 13px;
+    color: #F6F6F6;
+    border: none;
+}
+.myResetForm {
+    border-radius: 12px;
+    padding: 10px 13px;
+    border: 1px dashed #161819;
+}
+
 /* History */
 
 .content-container {
@@ -361,7 +400,7 @@ svg:hover {
     right: 0;
 }
 
-.e{
+.e {
     cursor: pointer;
 }
 
@@ -373,7 +412,7 @@ svg:hover {
 /* handphone */
 @media screen and (max-width: 678px) {
 
-    .left-bar , .right-bar {
+    .left-bar, .right-bar {
         z-index: 30;
         position: absolute;
         top: 0;
@@ -384,7 +423,7 @@ svg:hover {
         transition: all 0.3s;
     }
 
-    .left-bar.active , .right-bar.active {
+    .left-bar.active, .right-bar.active {
         opacity: 1;
         /* display: none; */
         transform: translateX(0);

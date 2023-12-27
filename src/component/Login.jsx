@@ -28,7 +28,7 @@ function Login() {
 
     useEffect(() => {
         // Panggil getDataFeedback saat komponen di-mount
-        redirectToHome(token);
+        // redirectToHome(token);
         new Promise((promise)=>{setTimeout(promise)},2000);
         checkedMe('email', 'email');
         checkedMe('pass', 'password');

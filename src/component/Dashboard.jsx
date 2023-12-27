@@ -13,17 +13,20 @@ import Cookies from 'js-cookie';
 import Lottie from 'lottie-react';
 import myLoad from '../asset/Load.json'
 import finding from '../image/findng.gif';
+import Modal from 'react-bootstrap/Modal';
+
 
 
 const url = "http://127.0.0.1/API_laravel/public/api";
 
 function Dashboard() {
+
     const [token, setToken] = useState(Cookies.get('token'));
     const [user, setUser] = useState(JSON.parse(Cookies.get('detailUser')));
     const [pageSlice, setPageSlice] = useState(0);
     const [loading, setLoading] = useState(true);
     const [file, setFile] = useState(null);
-    const [offCavas, setOfCanvas] = useState(false);
+    const [modalPostPengeluaran, setModalPostPengeluaran] = useState(false);
     const navigate = useNavigate();
 
     useEffect(function () {
@@ -37,6 +40,7 @@ function Dashboard() {
                 console.log(user);
                 await getLastPengeluaran(token);
                 await getQouteRandom(token);
+                await getCategory(token)
                 load(2);
                 await switchLoad(false);
                 console.log(loading);
@@ -61,15 +65,17 @@ function Dashboard() {
     // Dashboard : 
     const [dataQouteDashboard, setDataQouteDashboard] = useState([]);
     const [dataLastPengeluaran, setDataLastPengeluaran] = useState([]);
+    const [dataCategory, setDataCategory] = useState([]);
+    const [formPostPengeluaran, setFormPostPengeluaran] = useState({});
     //handle API Dashboard : 
     function getLastPengeluaran(token) {
         // switchLoad();
         if (token) {
             // switchLoad();
-            axios.get(`${url}/pengeluaran/last/${user.id}`, {},
+            axios.get(`${url}/pengeluaran/last/${user.id}`,
                 {
                     headers: {
-                        Authorization: token
+                        'Authorization': token
                     }
                 }).then((response) => {
                     // console.log(response.data.data)
@@ -85,16 +91,53 @@ function Dashboard() {
     function getQouteRandom(token) {
         if (token) {
             // switchLoad();
-            axios.get(`${url}/qoutes/5`, {}, {
+            axios.get(`${url}/qoutes/5`, {
                 headers: {
-                    Authorization: token
+                    'Authorization': token
                 }
             }).then(response => {
                 // console.log(response)
                 setDataQouteDashboard(response.data);
                 // switchLoad();
+            }).catch(error => {
+                console.log(error)
             })
         }
+    }
+
+    function getCategory(token) {
+        console.log(token)
+        if (token) {
+            // switchLoad();
+            axios.get(`${url}/category`, {
+                headers: {
+                    'Authorization': `${token}`,
+
+                }
+            }).then(response => {
+                setDataCategory(response.data.data);
+                console.log('Category : ', response);
+
+            }).catch(error => {
+                console.log(error)
+            })
+        }
+    }
+
+    const postPengeluaran = (e) => {
+        e.preventDefault();
+        console.dir(e.target[2]);
+        // axios.post(`${url}/pengeluaran/post`, {
+        //     title : e.target[0].value,
+        //     pengeluaran_uang : e.target[1].value,
+        //     id_category : ,
+        //     tanggal : ,
+        //     deskripsi : ,
+        // },{
+        //     headers : {
+
+        //     }
+        // })
     }
 
 
@@ -191,6 +234,7 @@ function Dashboard() {
     async function load(second) {
         await new Promise((prom) => setTimeout(prom, second * 1000));
     }
+
     function setActive(i) {
         const navTab = document.getElementsByClassName('nav-tab');
         Array.from(navTab).forEach(function (data, index) {
@@ -211,7 +255,7 @@ function Dashboard() {
 
     function page(page) {
         if (page === 0) {
-            return <DashboardSlice page='Dashboard' data={dataLastPengeluaran} username={user.name} handleLeftBar={() => toggleOfCanvas(1, 'left')} />
+            return <DashboardSlice page='Dashboard' data={dataLastPengeluaran} username={user.name} handleLeftBar={() => toggleOfCanvas(1, 'left')} handleModalCreate={() => setModalPostPengeluaran(true)} handleMoveToHistory={() => { setActive(1) }} />
         } else if (page === 1) {
             return <HistorySlice page='History Pengeluaran' handleLeftBar={() => toggleOfCanvas(1, 'left')} />
         } else if (page === 2) {
@@ -468,6 +512,79 @@ function Dashboard() {
                             <input type="submit" id='submit-avatar' hidden />
                         </form>
                     </div>
+                    {/* modal */}
+                    <Modal
+                        size="lg"
+                        show={modalPostPengeluaran}
+                        onHide={() => setModalPostPengeluaran(false)}
+                        aria-labelledby="example-modal-sizes-title-lg"
+                    >
+                        <Modal.Header closeButton>
+                            <div className="fs40 logo">inMoney</div>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <div className="container">
+                                <div className="myModal container">
+                                    <form action="" className="modal-form" onSubmit={postPengeluaran}>
+                                        <div className="fs27">Form Store Pengeluaran</div>
+                                        <div className="mt-3 row">
+                                            <div className="col-lg-5">
+                                                <div className="form-text">Write the title</div>
+                                                <Form.Control type="text" placeholder="Write the title here.." size='lg' className='form-dark' />
+                                            </div>
+                                            <div className="col-lg-5">
+                                                <div className="form-text">Rp. </div>
+                                                <Form.Control type="number" placeholder="Pengeluaran uang" size='lg' className='form-light' />
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3 gap-lg-0 gap-3 align-items-end">
+                                            <div className="col-lg-6">
+                                                <FloatingLabel controlId="" label="Choose one category">
+                                                    <Form.Select className='' aria-label="Floating label select example">
+                                                        {dataCategory.length > 0 ? (
+                                                            dataCategory.map(function (response, index) {
+                                                                console.log('Key' + index, response)
+                                                                return (
+                                                                    <option key={index} value={response.id}>{response.name}</option>
+                                                                );
+                                                            })
+                                                        ) : (
+                                                            <></>
+                                                        )}
+
+                                                    </Form.Select>
+                                                </FloatingLabel>
+                                            </div>
+                                            <div className="col-lg-5">
+                                                <input type="date" className="form-control" />
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3 align-items-end">
+                                            <div className="col-lg-9">
+                                                <FloatingLabel controlId="floatingTextarea2" label="Write Descriptive">
+                                                    <Form.Control
+                                                        as="textarea"
+                                                        placeholder="Leave a comment here"
+                                                        style={{ height: '100px' }}
+                                                    />
+                                                </FloatingLabel>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3 gap-3">
+                                            <span className='col-4 col-lg-2'>
+                                                <input type="submit" value="Save it" className='mySubmitForm' />
+
+                                            </span>
+                                            <span className='col-4 col-lg-2'>
+
+                                                <input type="reset" value="Reset form" className='myResetForm' />
+                                            </span>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </Modal.Body>
+                    </Modal>
                 </div>
             )
             }
@@ -477,7 +594,7 @@ function Dashboard() {
 
 function DashboardSlice(props) {
     // console.log('dashboard');
-    const { page, data, username, handleLeftBar } = props;
+    const { page, data, username, handleLeftBar, handleModalCreate, handleMoveToHistory } = props;
     const navigate = useNavigate();
     return (
         <div className='container my-5'>
@@ -500,7 +617,7 @@ function DashboardSlice(props) {
             <div className="box-container-feature mb-4">
                 <div className="row justify-content-around">
                     <div className="col-lg-6 p-2">
-                        <div className="card-feature">
+                        <div className="card-feature" onClick={handleModalCreate}>
                             <div className="inner">
                                 <svg className='fill ms-2' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="">
                                     <path d="M14 16H16V14H18V12H16V10H14V12H12V14H14V16ZM4 20C3.45 20 2.97933 19.8043 2.588 19.413C2.19667 19.0217 2.00067 18.5507 2 18V6C2 5.45 2.196 4.97933 2.588 4.588C2.98 4.19667 3.45067 4.00067 4 4H10L12 6H20C20.55 6 21.021 6.196 21.413 6.588C21.805 6.98 22.0007 7.45067 22 8V18C22 18.55 21.8043 19.021 21.413 19.413C21.0217 19.805 20.5507 20.0007 20 20H4Z" fill="white" />
@@ -513,7 +630,7 @@ function DashboardSlice(props) {
 
                     </div>
                     <div className="col-lg-6 p-2">
-                        <div className="card-feature">
+                        <div className="card-feature" onClick={handleMoveToHistory}>
                             <div className="inner">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                     <path d="M12 8V12L14 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -688,7 +805,7 @@ function SearchSlice(props) {
                         <Form.Control className='my-2' type="number" placeholder="" />
                         <div className="form-text">Masukn jmlah maksimal</div>
                     </div>
-                    
+
                     <span className="search ms-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                             <path fill-rule="evenodd" clip-rule="evenodd" d="M11 2C9.56238 2.00016 8.14571 2.3447 6.86859 3.00479C5.59146 3.66489 4.49105 4.62132 3.65947 5.79402C2.82788 6.96672 2.28933 8.32158 2.08889 9.74516C1.88844 11.1687 2.03194 12.6196 2.50738 13.9764C2.98281 15.3331 3.77634 16.5562 4.82154 17.5433C5.86673 18.5304 7.13318 19.2527 8.51487 19.6498C9.89656 20.0469 11.3533 20.1073 12.7631 19.8258C14.1729 19.5443 15.4947 18.9292 16.618 18.032L20.293 21.707C20.4816 21.8892 20.7342 21.99 20.9964 21.9877C21.2586 21.9854 21.5094 21.8802 21.6948 21.6948C21.8802 21.5094 21.9854 21.2586 21.9877 20.9964C21.99 20.7342 21.8892 20.4816 21.707 20.293L18.032 16.618C19.09 15.2939 19.7526 13.6979 19.9435 12.0138C20.1344 10.3297 19.8459 8.62586 19.1112 7.0985C18.3764 5.57113 17.2253 4.28228 15.7904 3.38029C14.3554 2.47831 12.6949 1.99985 11 2ZM5 11C5 10.2121 5.1552 9.43185 5.45673 8.7039C5.75825 7.97595 6.20021 7.31451 6.75736 6.75736C7.31451 6.20021 7.97595 5.75825 8.7039 5.45672C9.43186 5.15519 10.2121 5 11 5C11.7879 5 12.5682 5.15519 13.2961 5.45672C14.0241 5.75825 14.6855 6.20021 15.2426 6.75736C15.7998 7.31451 16.2418 7.97595 16.5433 8.7039C16.8448 9.43185 17 10.2121 17 11C17 12.5913 16.3679 14.1174 15.2426 15.2426C14.1174 16.3679 12.5913 17 11 17C9.4087 17 7.88258 16.3679 6.75736 15.2426C5.63214 14.1174 5 12.5913 5 11Z" fill="black" />
@@ -732,16 +849,16 @@ function SearchSlice(props) {
                     <div className="fs14 mt-2">Disni adalh tempat dimana anda dapat mencari data pengeluaran anda secara spesifik.</div>
                 </div>
                 <div className="col-lg-3 col-6">
-                    <div className="form-text text-end e" onClick={()=>setShowControllerFilter(!showControllerFilter)}>
-                    {showControllerFilter ? (
-                        <>
-                        hide me.
-                        </>
-                    ) : (
-                         <>
-                        Show me.
-                        </>
-                    ) }
+                    <div className="form-text text-end e" onClick={() => setShowControllerFilter(!showControllerFilter)}>
+                        {showControllerFilter ? (
+                            <>
+                                hide me.
+                            </>
+                        ) : (
+                            <>
+                                Show me.
+                            </>
+                        )}
                     </div>
                     {showControllerFilter ? (
                         <div className="control">
@@ -753,7 +870,7 @@ function SearchSlice(props) {
                                 </Form.Select>
                             </FloatingLabel>
                         </div>
-                    ):(
+                    ) : (
                         <>
                         </>
                     )}
