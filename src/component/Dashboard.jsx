@@ -21,8 +21,8 @@ const url = "http://127.0.0.1/API_laravel/public/api";
 
 function Dashboard() {
 
-    const [token, setToken] = useState(Cookies.get('token'));
     const [user, setUser] = useState(JSON.parse(Cookies.get('detailUser')));
+    const [token, setToken] = useState(Cookies.get('token'));
     const [pageSlice, setPageSlice] = useState(0);
     const [loading, setLoading] = useState(true);
     const [file, setFile] = useState(null);
@@ -66,7 +66,7 @@ function Dashboard() {
     const [dataQouteDashboard, setDataQouteDashboard] = useState([]);
     const [dataLastPengeluaran, setDataLastPengeluaran] = useState([]);
     const [dataCategory, setDataCategory] = useState([]);
-    const [formPostPengeluaran, setFormPostPengeluaran] = useState({});
+    // const [formPostPengeluaran, setFormPostPengeluaran] = useState({});
     //handle API Dashboard : 
     function getLastPengeluaran(token) {
         // switchLoad();
@@ -126,18 +126,35 @@ function Dashboard() {
 
     const postPengeluaran = (e) => {
         e.preventDefault();
-        console.dir(e.target[2]);
-        // axios.post(`${url}/pengeluaran/post`, {
-        //     title : e.target[0].value,
-        //     pengeluaran_uang : e.target[1].value,
-        //     id_category : ,
-        //     tanggal : ,
-        //     deskripsi : ,
-        // },{
-        //     headers : {
+        // console.dir(e.target);
+        axios.post(`${url}/pengeluaran/post`, {
+            title: e.target[0].value,
+            pengeluaran_uang: e.target[1].value,
+            id_category: e.target[2].value,
+            tanggal: e.target[3].value,
+            deskripsi: e.target[4].value,
+        }, {
+            headers: {
+                'Authorization': token
+            }
+        }).then(response => {
+            Swal.fire({
+                title: "Congratss!",
+                text: response.data.data.message,
+                icon: "success"
+            }).then(() => {
+                e.target[0].value = '';
+                e.target[1].value = '';
+                e.target[2].value = '';
+                e.target[3].value = '';
+                e.target[4].value = '';
 
-        //     }
-        // })
+                window.location.reload();
+            })
+            console.log(response)
+        }).catch(error => {
+            console.log(error)
+        })
     }
 
 
@@ -257,9 +274,9 @@ function Dashboard() {
         if (page === 0) {
             return <DashboardSlice page='Dashboard' data={dataLastPengeluaran} username={user.name} handleLeftBar={() => toggleOfCanvas(1, 'left')} handleModalCreate={() => setModalPostPengeluaran(true)} handleMoveToHistory={() => { setActive(1) }} />
         } else if (page === 1) {
-            return <HistorySlice page='History Pengeluaran' handleLeftBar={() => toggleOfCanvas(1, 'left')} />
+            return <HistorySlice page='History Pengeluaran' user={user} handleLeftBar={() => toggleOfCanvas(1, 'left')} token={token} />
         } else if (page === 2) {
-            return <SearchSlice page='Search Pengeluaran' maxShow={maxShow} handleLeftBar={() => toggleOfCanvas(1, 'left')} />
+            return <SearchSlice page='Search Pengeluaran' maxShow={maxShow} handleLeftBar={() => toggleOfCanvas(1, 'left')} dataCategory={dataCategory} />
         } else if (page === 3) {
             return <DeletedSlice />
         } else if (page === 4) {
@@ -286,7 +303,6 @@ function Dashboard() {
                 icon: "error"
             }).then(() => {
                 navigate('/login');
-
             })
         } else if (!data && showAlert === false) {
             navigate('/login');
@@ -530,20 +546,20 @@ function Dashboard() {
                                         <div className="mt-3 row">
                                             <div className="col-lg-5">
                                                 <div className="form-text">Write the title</div>
-                                                <Form.Control type="text" placeholder="Write the title here.." size='lg' className='form-dark' />
+                                                <Form.Control type="text" placeholder="Write the title here.." size='lg' className='form-dark' required />
                                             </div>
                                             <div className="col-lg-5">
                                                 <div className="form-text">Rp. </div>
-                                                <Form.Control type="number" placeholder="Pengeluaran uang" size='lg' className='form-light' />
+                                                <Form.Control type="number" placeholder="Pengeluaran uang" size='lg' className='form-light' required />
                                             </div>
                                         </div>
                                         <div className="row mt-3 gap-lg-0 gap-3 align-items-end">
                                             <div className="col-lg-6">
                                                 <FloatingLabel controlId="" label="Choose one category">
-                                                    <Form.Select className='' aria-label="Floating label select example">
+                                                    <Form.Select className='' aria-label="Floating label select example" required>
                                                         {dataCategory.length > 0 ? (
                                                             dataCategory.map(function (response, index) {
-                                                                console.log('Key' + index, response)
+                                                                // console.log('Key' + index, response)
                                                                 return (
                                                                     <option key={index} value={response.id}>{response.name}</option>
                                                                 );
@@ -566,6 +582,7 @@ function Dashboard() {
                                                         as="textarea"
                                                         placeholder="Leave a comment here"
                                                         style={{ height: '100px' }}
+                                                        required
                                                     />
                                                 </FloatingLabel>
                                             </div>
@@ -676,7 +693,7 @@ function DashboardSlice(props) {
                     {
                         data.map(function (response, index) {
                             return (
-                                <MyCard title={response.title} des={response.deskripsi} price={response.uang} categ={response.category} date={response.tanggal} handle='' />
+                                <MyCard title={response.title} des={response.deskripsi} price={response.uang} categ={response.category} date={response.tanggal} handle={() => navigate(`/dashboard/detail/${response.id}`)} />
                             );
                         })
                     }
@@ -695,7 +712,28 @@ function DashboardSlice(props) {
     );
 }
 function HistorySlice(props) {
-    const { page, handleLeftBar } = props;
+    const { page, handleLeftBar, token, user } = props;
+    const [order, setOrder] = useState('desc');
+    const [dataPengeluaran, setDataPengeluaran] = useState([])
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        getDataWithOrder(token);
+    }, [order])
+
+    const getDataWithOrder = (token) => {
+        // console.log('Console dri komponent History', token, user);
+
+        axios.get(`${url}/pengeluaran/ById/${user.id}/${order}`, {
+            headers: {
+                'Authorization': token
+            }
+        }).then((response) => {
+            setDataPengeluaran(response.data.data)
+        }).catch(error => {
+            console.log(error)
+        })
+    }
     return (
         <div className='my-4 container'>
             <div className="d-lg-none">
@@ -711,20 +749,34 @@ function HistorySlice(props) {
                     <div className="fs14">Disni adalh tempat dimana pengeluaran anda dikelola. urutkan sesuai kebutuhanmu di pojok kanan</div>
                 </div>
                 <div className="col-lg-3 col-6">
+
                     <FloatingLabel controlId="floatingSelect" label="Urutkan saya Dari :">
-                        <Form.Select aria-label="Floating label select example">
-                            <option value="1">Terbaru</option>
-                            <option value="2">Terlama</option>
+                        <Form.Select aria-label="Floating label select example" onChange={(e) => setOrder(e.target.value)} value={order}>
+                            <option value="desc">Terbaru</option>
+                            <option value="asc">Terlama</option>
                         </Form.Select>
                     </FloatingLabel>
                 </div>
+                <hr className='my-2' />
                 <div className="content-container mt-4">
+                    {dataPengeluaran.length > 0 ? (
+                        dataPengeluaran.map(function (response, index) {
+                            return (
 
-                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
+                                <MyCard title={response.title} des={response.deskripsi} price={response.pengeluaran_uang} date={response.tanggal} categ={
+                                    response.relationcategory.category_name
+                                } handle={() => navigate(`/dashboard/detail/${response.id}`)} />
+                            )
+                        })
+                    ) : (
+                        <div className="my-4 text-center fs20">
+                            something error. maybe is still loaded. please patients
+                        </div>
+                    )}
 
-                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
+                    {/* <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
 
-                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
+                <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' /> */}
                 </div>
                 <div className="my-5 text-center">
                     <span className="load-more">
@@ -732,21 +784,127 @@ function HistorySlice(props) {
                     </span>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
 function SearchSlice(props) {
-    const { page, handleLeftBar } = props;
-    const [toggleFilter, setToggleFilter] = useState(0);
+    const navigate = useNavigate();
+    const { page, handleLeftBar, dataCategory } = props;
+    const [toggleFilter, setToggleFilter] = useState(1);
     const [maxShow, setMaxShow] = useState(10);
-    const [showControllerFilter, setShowControllerFilter] = useState(true)
+    const [showControllerFilter, setShowControllerFilter] = useState(true);
+    const [dataFiltered, setDataFiltered] = useState([]);
 
     function toggleFilterFunc(filter) {
         setToggleFilter(filter);
     }
 
-    function showedPage(filterpage) {
+
+
+    function ShowedPage(filterpage) {
         // console.log(filterpage);
+        // const navigate = useNavigate();
+        const [categ, setCateg] = useState(0);
+        const [searcQ, setSearchQ] = useState('');
+        const user = JSON.parse(Cookies.get('detailUser'));
+        const [isRequest, setIsRequest] = useState(false);
+
+        const requestData = (filter, qtype) => {
+            const tokenable = Cookies.get('token');
+            let config = {};
+            console.log(tokenable);
+
+            if (isRequest === true) {
+
+                Swal.fire({
+                    title: "Malfunction",
+                    text: 'Kamu masi request data. permintaan dibatalkan.',
+                    icon: "error"
+                });
+
+            } else {
+                setIsRequest(true);
+                if (qtype === 'category') {
+                    config = {
+                        headers: {
+                            'Authorization': tokenable
+                        }
+                    }
+
+                    axios.get(`${url}/pengeluaran/category/${user.id}/${categ}/${maxShow}`, config)
+                        .then((response) => {
+                            setIsRequest(false);
+                            setDataFiltered(response.data);
+                            // console.log(response)
+                        }).catch((error) => {
+                            setIsRequest(false);
+                            console.log(error)
+                        });
+
+                } else if (qtype === 'search') {
+                    const searcInputQuery = document.querySelector('.searchQ');
+                    // console.dir(searcInputQuery);
+                    config = {
+                        headers: {
+                            'Authorization': tokenable
+                        }
+                    }
+
+                    axios.get(`${url}/pengeluaran/search/${user.id}/${searcInputQuery.value}/${maxShow}`, config)
+                        .then((response) => {
+                            setIsRequest(false);
+                            setDataFiltered(response.data)
+                            // console.log(response)
+                        }).catch((error) => {
+                            setIsRequest(false);
+                            console.log(error);
+                        });
+
+                    // console.log('sudah masuk ke qtype search')
+                } else if (qtype === 'pengeluaran') {
+                    const penge_min = document.querySelector('.pengeluaran_min');
+                    const penge_max = document.querySelector('.pengeluaran_max');
+                    config = {
+                        headers: {
+                            'Authorization': tokenable
+                        }
+                    }
+
+                    axios.get(`${url}/pengeluaran/money/${user.id}/${penge_min.value}/${penge_max.value}/${maxShow}`, config)
+                        .then((response) => {
+                            setIsRequest(false);
+                            setDataFiltered(response.data);
+                            console.log(response);
+                        }).catch((error) => {
+                            setIsRequest(false);
+                            console.log(error)
+                        });
+
+
+                } else if (qtype === 'date') {
+                    const date = document.querySelector('.date-picker');
+                    config = {
+                        headers: {
+                            'Authorization': tokenable
+                        }
+                    }
+                    axios.get(`${url}/pengeluaran/date/${user.id}/${date.value}/${maxShow}`, config)
+                        .then((response) => {
+                            setIsRequest(false);
+                            setDataFiltered(response.data);
+                            // console.log(response)
+                        }).catch((error) => {
+                            setIsRequest(false);
+                            console.log(error)
+                        });
+
+                }
+            }
+
+
+
+        }
+
         if (filterpage == 1) {
             return (
                 <div>
@@ -754,16 +912,17 @@ function SearchSlice(props) {
                     <div className='row gap-3 mt-3'>
                         <div className="col-lg-6 row justify-content-center align-items-center">
                             <div className="col-10">
+
                                 <FloatingLabel
                                     controlId="floatingInput"
                                     label="Type something here"
-                                    className=""
+
                                 >
-                                    <Form.Control type="text" placeholder="name@example.com" />
+                                    <Form.Control type="text" placeholder="name@example.com" className="searchQ" />
                                 </FloatingLabel>
                             </div>
                             <div className="col-2">
-                                <div className="search">
+                                <div className="search" onClick={() => requestData(1, 'search')}>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                         <path fill-rule="evenodd" clip-rule="evenodd" d="M11 2C9.56238 2.00016 8.14571 2.3447 6.86859 3.00479C5.59146 3.66489 4.49105 4.62132 3.65947 5.79402C2.82788 6.96672 2.28933 8.32158 2.08889 9.74516C1.88844 11.1687 2.03194 12.6196 2.50738 13.9764C2.98281 15.3331 3.77634 16.5562 4.82154 17.5433C5.86673 18.5304 7.13318 19.2527 8.51487 19.6498C9.89656 20.0469 11.3533 20.1073 12.7631 19.8258C14.1729 19.5443 15.4947 18.9292 16.618 18.032L20.293 21.707C20.4816 21.8892 20.7342 21.99 20.9964 21.9877C21.2586 21.9854 21.5094 21.8802 21.6948 21.6948C21.8802 21.5094 21.9854 21.2586 21.9877 20.9964C21.99 20.7342 21.8892 20.4816 21.707 20.293L18.032 16.618C19.09 15.2939 19.7526 13.6979 19.9435 12.0138C20.1344 10.3297 19.8459 8.62586 19.1112 7.0985C18.3764 5.57113 17.2253 4.28228 15.7904 3.38029C14.3554 2.47831 12.6949 1.99985 11 2ZM5 11C5 10.2121 5.1552 9.43185 5.45673 8.7039C5.75825 7.97595 6.20021 7.31451 6.75736 6.75736C7.31451 6.20021 7.97595 5.75825 8.7039 5.45672C9.43186 5.15519 10.2121 5 11 5C11.7879 5 12.5682 5.15519 13.2961 5.45672C14.0241 5.75825 14.6855 6.20021 15.2426 6.75736C15.7998 7.31451 16.2418 7.97595 16.5433 8.7039C16.8448 9.43185 17 10.2121 17 11C17 12.5913 16.3679 14.1174 15.2426 15.2426C14.1174 16.3679 12.5913 17 11 17C9.4087 17 7.88258 16.3679 6.75736 15.2426C5.63214 14.1174 5 12.5913 5 11Z" fill="black" />
                                     </svg>
@@ -774,10 +933,17 @@ function SearchSlice(props) {
                     <div className="mt-4">
                         <div className="fs14">Or choose the category below :</div>
                         <div className="justify-content-center gap-3 category-container py-3">
-                            <span className="chip gap-2">Gaming</span>
-                            <span className="chip gap-2">Gaming</span>
-                            <span className="chip gap-2">Gaming</span>
-                            <span className="chip gap-2">Gaming</span>
+                            {dataCategory.length > 0 ? (
+                                dataCategory.map(function (response, index) {
+                                    // console.log('Key' + index, response)
+                                    return (
+                                        <span onClick={() => { setCateg(response.id); requestData(1, 'category') }} className="chip gap-2">{response.name}</span>
+
+                                    );
+                                })
+                            ) : (
+                                <></>
+                            )}
                         </div>
                     </div>
 
@@ -791,7 +957,7 @@ function SearchSlice(props) {
                             from
                         </div>
 
-                        <Form.Control className='bg-dark text-light my-2' type="number" placeholder="Masukan uang minimal" />
+                        <Form.Control className='bg-dark text-light my-2 pengeluaran_min' type="number" placeholder="Masukan uang minimal" />
                         <div className="form-text">Masukan jumlah minimal</div>
                     </div>
                     <span className=" col-lg-1 col-1 fs18 text-center b">
@@ -802,11 +968,11 @@ function SearchSlice(props) {
                             to
                         </div>
 
-                        <Form.Control className='my-2' type="number" placeholder="" />
+                        <Form.Control className='my-2 pengeluaran_max' type="number" placeholder="" />
                         <div className="form-text">Masukn jmlah maksimal</div>
                     </div>
 
-                    <span className="search ms-2">
+                    <span className="search ms-2" onClick={() => requestData(2, 'pengeluaran')}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                             <path fill-rule="evenodd" clip-rule="evenodd" d="M11 2C9.56238 2.00016 8.14571 2.3447 6.86859 3.00479C5.59146 3.66489 4.49105 4.62132 3.65947 5.79402C2.82788 6.96672 2.28933 8.32158 2.08889 9.74516C1.88844 11.1687 2.03194 12.6196 2.50738 13.9764C2.98281 15.3331 3.77634 16.5562 4.82154 17.5433C5.86673 18.5304 7.13318 19.2527 8.51487 19.6498C9.89656 20.0469 11.3533 20.1073 12.7631 19.8258C14.1729 19.5443 15.4947 18.9292 16.618 18.032L20.293 21.707C20.4816 21.8892 20.7342 21.99 20.9964 21.9877C21.2586 21.9854 21.5094 21.8802 21.6948 21.6948C21.8802 21.5094 21.9854 21.2586 21.9877 20.9964C21.99 20.7342 21.8892 20.4816 21.707 20.293L18.032 16.618C19.09 15.2939 19.7526 13.6979 19.9435 12.0138C20.1344 10.3297 19.8459 8.62586 19.1112 7.0985C18.3764 5.57113 17.2253 4.28228 15.7904 3.38029C14.3554 2.47831 12.6949 1.99985 11 2ZM5 11C5 10.2121 5.1552 9.43185 5.45673 8.7039C5.75825 7.97595 6.20021 7.31451 6.75736 6.75736C7.31451 6.20021 7.97595 5.75825 8.7039 5.45672C9.43186 5.15519 10.2121 5 11 5C11.7879 5 12.5682 5.15519 13.2961 5.45672C14.0241 5.75825 14.6855 6.20021 15.2426 6.75736C15.7998 7.31451 16.2418 7.97595 16.5433 8.7039C16.8448 9.43185 17 10.2121 17 11C17 12.5913 16.3679 14.1174 15.2426 15.2426C14.1174 16.3679 12.5913 17 11 17C9.4087 17 7.88258 16.3679 6.75736 15.2426C5.63214 14.1174 5 12.5913 5 11Z" fill="black" />
                         </svg>
@@ -822,7 +988,7 @@ function SearchSlice(props) {
                         </div>
                     </span>
 
-                    <span className="search ms-2">
+                    <span className="search ms-2" onClick={() => requestData(3, 'date')}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                             <path fill-rule="evenodd" clip-rule="evenodd" d="M11 2C9.56238 2.00016 8.14571 2.3447 6.86859 3.00479C5.59146 3.66489 4.49105 4.62132 3.65947 5.79402C2.82788 6.96672 2.28933 8.32158 2.08889 9.74516C1.88844 11.1687 2.03194 12.6196 2.50738 13.9764C2.98281 15.3331 3.77634 16.5562 4.82154 17.5433C5.86673 18.5304 7.13318 19.2527 8.51487 19.6498C9.89656 20.0469 11.3533 20.1073 12.7631 19.8258C14.1729 19.5443 15.4947 18.9292 16.618 18.032L20.293 21.707C20.4816 21.8892 20.7342 21.99 20.9964 21.9877C21.2586 21.9854 21.5094 21.8802 21.6948 21.6948C21.8802 21.5094 21.9854 21.2586 21.9877 20.9964C21.99 20.7342 21.8892 20.4816 21.707 20.293L18.032 16.618C19.09 15.2939 19.7526 13.6979 19.9435 12.0138C20.1344 10.3297 19.8459 8.62586 19.1112 7.0985C18.3764 5.57113 17.2253 4.28228 15.7904 3.38029C14.3554 2.47831 12.6949 1.99985 11 2ZM5 11C5 10.2121 5.1552 9.43185 5.45673 8.7039C5.75825 7.97595 6.20021 7.31451 6.75736 6.75736C7.31451 6.20021 7.97595 5.75825 8.7039 5.45672C9.43186 5.15519 10.2121 5 11 5C11.7879 5 12.5682 5.15519 13.2961 5.45672C14.0241 5.75825 14.6855 6.20021 15.2426 6.75736C15.7998 7.31451 16.2418 7.97595 16.5433 8.7039C16.8448 9.43185 17 10.2121 17 11C17 12.5913 16.3679 14.1174 15.2426 15.2426C14.1174 16.3679 12.5913 17 11 17C9.4087 17 7.88258 16.3679 6.75736 15.2426C5.63214 14.1174 5 12.5913 5 11Z" fill="black" />
                         </svg>
@@ -878,7 +1044,7 @@ function SearchSlice(props) {
                 </div>
             </div>
             <div className="row">
-                {showedPage(toggleFilter)}
+                {ShowedPage(toggleFilter)}
             </div>
             <hr />
             <div className="row justify-content-end">
@@ -896,14 +1062,19 @@ function SearchSlice(props) {
             </div>
             <div className="content-container mt-3">
                 <div className="d-flex-column">
-
-                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
-                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
-                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
-                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
-                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
-                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
-                    <MyCard title='Tester' des='Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, esse?' price='150000' date='1-12-2007' categ='Gaming' />
+                    {dataFiltered.length > 0 ? (
+                        dataFiltered.map(function (response, index) {
+                            console.log(response);
+                            return (
+                                <MyCard title={response.title} des={response.deskripsi} price={response.pengeluaran_uang} date={response.tanggal
+                                } categ={response.relationcategory.category_name } handle={() => navigate(`/dashboard/detail/${response.id}`)} />
+                            )
+                        })
+                    ) : (
+                        <div className="mx-auto my-4 px-3 text-center fs18 b tGray">
+                            Hasil tidak ditemukan. mungkin kurang spesifik dan coba lagi.
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="my-5 text-center">
@@ -953,7 +1124,7 @@ function Mybutton(props) {
 function MyCard(props) {
     const { title, des, price, date, categ, handle } = props;
     return (
-        <div className="myCard mb-3" >
+        <div className="myCard mb-3" onClick={handle} >
             <div className="row">
                 <div className="col-lg-6">
                     <span className="date fs14">{date}</span>

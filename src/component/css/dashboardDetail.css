@@ -1,0 +1,18 @@
+.left {
+    border-right: 2px solid black;
+}
+
+.category {
+    border-radius: 5px;
+    background: var(--Adrift-on-the-Nile-900, #3B4A5B);
+    padding: 5px 8px;
+    display: inline-flex;
+    width: fit-content;
+    color: white;
+}
+
+.myButton {
+    border-radius: 5px;
+    background: var(--Adrift-on-the-Nile-1000, #1D252D);
+    color: white;
+}
