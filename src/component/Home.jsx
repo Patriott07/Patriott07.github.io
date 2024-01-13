@@ -17,7 +17,7 @@ import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
 
 // const axios = require('axios');
-const url = "http://127.0.0.1/API_laravel/public/api";
+const url = "https://patriottoa.000webhostapp.com/api";
 
 function Home() {
     const navigate = useNavigate();

@@ -16,7 +16,7 @@ import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
 
 
-const url = "http://127.0.0.1/API_laravel/public/api";
+const url = "https://patriottoa.000webhostapp.com/api";
 function Login() {
 
     const [email, setEmail] = useState('');
@@ -77,11 +77,12 @@ function Login() {
                 navigate('/');
             }
         }).catch(error => {
-            Swal.fire({
-                title: "Malfunction",
-                text: error.response.data.message,
-                icon: "error"
-              });
+            // Swal.fire({
+            //     title: "Malfunction",
+            //     text: error.response.data.message,
+            //     icon: "error"
+            //   });
+            console.log(error);
         })
     }
     return (

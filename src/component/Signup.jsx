@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
 
 
-const url = "http://127.0.0.1/API_laravel/public/api";
+const url = "https://patriottoa.000webhostapp.com/api";
 function Signup() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
