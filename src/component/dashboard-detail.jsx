@@ -1,10 +1,11 @@
+/* eslint-disable */
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
 import Lottie from 'lottie-react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import 'https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js';
 import 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -145,8 +146,8 @@ function DashboardDetail() {
 
         async function start(){
             try{
-                const fetch1 = await getDetail(token, id);
-                const fetch2 = await getCategory(token);
+                await getDetail(token, id);
+                await getCategory(token);
             }catch(error){
                 console.log(error)
                 console.log(detailData)
@@ -154,7 +155,7 @@ function DashboardDetail() {
         }
 
         start();
-    }, [])
+    },[detailData,id,token])
 
     return (
         <div className="container vh-100 d-flex justify-content-center align-items-center">
